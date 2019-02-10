@@ -1,5 +1,6 @@
 package com.example.qrcode;
 
+
 public class QrRead {
 
     /* ------------ VARIABLES -------------------- */
@@ -10,7 +11,7 @@ public class QrRead {
 
     /* ------------ CONSTRUCTEURS ---------------- */
 
-    public QrRead() {	// créer un qr code de valeurs prédéfinies
+    public QrRead() {	// créer un qr code de valeurs prédéfinies (article wiki)
 
         this.qr_data = new int[][] {{1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1},
                 {1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1},
@@ -54,7 +55,7 @@ public class QrRead {
 
     public int[] getFormatBits() {	// Récupère les deux mots de format, applique le masque et renvoie deux entiers
 
-        /** Variables **/
+        /**** Variables ****/
 
         // emplacement des bits de format pour un QRcode 21x21
         int[][] formatbits_location = new int[][] {{20, 8}, {19, 8}, {18, 8}, {17, 8}, {16, 8}, {15, 8}, {14,8},
@@ -68,7 +69,7 @@ public class QrRead {
         String temp = "";
         int[] formatbits = new int[2];
 
-        /** Récupération des bits de format sur la colonne **/
+        /**** Récupération des bits de format sur la colonne ****/
         for (int i = 0; i < this.qr_formatbits_size; i++) {
 
             int[] pos = new int[2];
@@ -79,7 +80,7 @@ public class QrRead {
         formatbits[0] = formatbits[0] ^ formatbits_mask;		        // application du masque des bits de format
         temp = "";														// remise à zéro de la variable temporaire
 
-        /** Récupération des bits de format sur la ligne **/
+        /**** Récupération des bits de format sur la ligne ****/
         for (int i = 0; i < this.qr_formatbits_size; i++) {
 
             int[] pos = new int[2];
@@ -93,7 +94,7 @@ public class QrRead {
 
     }
 
-    public int getMask() {		// Renvoie le numéro correspodant au masque dans les bits de format
+    public int getMask() {			// Renvoie le numéro correspodant au masque dans les bits de format
         int mask;
         int formatbits;
         int mask_maskbits = 7168; 					// masque pour les bits en position 2, 3 et 4 (sur 15 en partant des poids forts)
@@ -104,8 +105,8 @@ public class QrRead {
         return mask;
     }
 
-    public void unmaskData() {	// Applique le masque décrit dans les bits de format au bit de données
-        /** Variables **/
+    public void unmaskData() {		// Applique le masque décrit dans les bits de format au bit de données
+        /**** Variables ****/
         int mask;
         int mask_value;
         mask = this.getMask(); // récupérer le masque
@@ -149,8 +150,8 @@ public class QrRead {
         return value;
     }
 
-    public String getDataUp(int i, int j, int nb_lines) {	// Récupère nb_lines du QR code à partir du coin inf droit (i,j) en montant
-        /** Variables **/
+    private String getDataUp(int i, int j, int nb_lines) {	// Récupère nb_lines du QR code à partir du coin inf droit (i,j) en montant
+        /**** Variables ****/
         String temp = "";
 
 
@@ -161,8 +162,8 @@ public class QrRead {
         return temp;
     }
 
-    public String getDataDown(int i, int j, int nb_lines) {	// Récupère nb_line du QR code à partir du coin sup droit (i,j) en descendant
-        /** Variables **/
+    private String getDataDown(int i, int j, int nb_lines) {	// Récupère nb_line du QR code à partir du coin sup droit (i,j) en descendant
+        /**** Variables ****/
         String temp = "";
 
 
@@ -173,9 +174,9 @@ public class QrRead {
         return temp;
     }
 
-    public String getQRData() {	// Renvoie une String de tous les bits
+    private String getQRData() {		// Renvoie une String de tous les bits
 
-        /** Variables **/
+        /**** Variables ****/
         String data = "";
 
         // positions de départ hardcodées (i,j), sens de parcours nombres de lignes (0:down, 1:up),
@@ -185,7 +186,7 @@ public class QrRead {
                 {12, 8, 1, 4}, {9, 5, 0, 4}, {12, 3, 1, 4}, {9, 1, 0, 4}};
         int[] start_bit = new int[4];
 
-        /** Traitement **/
+        /**** Traitement ****/
         for (int l = 0; l < start_bits_list.length; l++) {
             start_bit = start_bits_list[l];
 
@@ -202,18 +203,18 @@ public class QrRead {
 
     public String[] getQRBytes() { // Renvoie un tableau 1 octet = 1 nombre hexa
 
-        /** Variables **/
+        /**** Variables ****/
         String data = this.getQRData();								// Récupère une chaîne de caractère contenant tous les bits
         String[] QRbytes = new String[(int) (data.length() / 8)];	// Init le tableau d'hexa à renvoyer
         String octet = "";											// Var temporaire
 
-        /** Traitement **/
+        /**** Traitement ****/
         for (int i = 0; i < data.length(); i = i + 8) {	// Parcours octet par octet
             for(int j = 0; j < 8; j ++) {
-                octet += data.charAt(i + j); 			// Concaténation des bits
+                octet += data.charAt(i + j); 			// Concatènation des bits
             }
             QRbytes[(int) (i / 8)] = Integer.toString(Integer.parseInt(octet, 2),16); // Convertion du binaire en hexa
-            octet = "";																            // RAZ de la var temp
+            octet = "";																  // RAZ de la var temp
         }
         return QRbytes;
     }
