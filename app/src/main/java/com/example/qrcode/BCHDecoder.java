@@ -1,6 +1,6 @@
 package com.example.qrcode;
 
-public class bchDecoder {
+public class BCHDecoder {
     private int poids(int x)
     {
         // Prend un entier x et renvoie son poids (somme des bits non nuls)
