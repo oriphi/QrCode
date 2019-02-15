@@ -47,10 +47,12 @@ public class BCHDecoder {
         }
         return reste;
     }
-    static public int qrFormat(int format)
+    static public int[] qrFormat(int format)
     {
         // Permet de corriger le format
         // format: entier correspondant aux bits de format lus après le démasquage
+
+        // Renvoie le format corrigé et la distance au mot corrigé
 
         int g = 0x537; // Polynome générateur du code BCH
         int res = bchCheck(format, g);
@@ -78,6 +80,6 @@ public class BCHDecoder {
                 mini = i;
         }
         // On renvoie le mot selectionné
-        return (mini << 10) ^ bchCheck(mini << 10,g);
+        return new int[]{(mini << 10) ^ bchCheck(mini << 10,g), tests[mini]};
     }
 }
