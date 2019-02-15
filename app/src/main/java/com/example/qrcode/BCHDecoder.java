@@ -59,7 +59,7 @@ public class BCHDecoder {
         if (res == 0) {
             System.out.println("Aucune erreur detectée !");
             // La transmission s'est bien faite, on a pas détecté d'errreur dans le format
-            return format;
+            return new int[]{format,0};
         }
         System.out.println("Attention passage en mode correcteur !");
 
