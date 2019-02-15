@@ -1,5 +1,6 @@
 package com.example.qrcode;
 import com.example.qrcode.GfArithmetic;
+import java.util.Arrays;
 
 
 public class ReedSolomon {
@@ -15,22 +16,23 @@ public class ReedSolomon {
 
         // On ajoute un syndrome nul pour une question d'indice
         int[] syndromes = new int[N + 1];
-        for(int i = 1; i < N; i++ )
+        for(int i = 0; i < N; i++ )
         {
-            syndromes[i] = this.gf.polyEval(msg, this.gf.gfPow(2,i));
+            syndromes[i + 1] = this.gf.polyEval(msg, this.gf.gfPow(2,i));
         }
+
+        System.out.println(Arrays.toString(syndromes));
         return syndromes;
     }
 
-    private int[] polyShift(int[] p) throws ArithmeticException
+    public int[] polyShift(int[] p) throws ArithmeticException
     {
        int[] res = new int[p.length];
-       for(int i = 0; i < p.length; i++)
+        if (p[p.length - 1] != 0)
+            throw new ArithmeticException("Overflow");
+       for(int i = 0; i < p.length - 1; i++)
        {
-           if ((i + 1) >= p.length)
-               throw new ArithmeticException("Overflow");
-           else
-               res[i + 1] = p[i];
+           res[i + 1] = p[i];
        }
        return res;
     }
@@ -82,8 +84,9 @@ public class ReedSolomon {
                try {
                    p = this.polyShift(B);
                }
-               catch (ArithmeticException e)
+               catch (ArithmeticException e) {
                    throw new ArithmeticException("Too much error");
+               }
 
                p = this.gf.polyScal(p,d);
                LambdaOld = Lambda; // Attention peut-être des problèmes de copie
@@ -110,30 +113,57 @@ public class ReedSolomon {
     {
        int t = N / 2;
 
+       int X,k = 0,i, O, L2, a;
 
        int[] syndromes = this.evalueSyndromes(msg,N);
+       System.out.println("Syndromes:");
+        System.out.println(Arrays.toString(syndromes));
        int[] syndromesReverse = new int[syndromes.length - 1];
-       for(int i =0; i< syndromesReverse.length; i ++)
+       for(i =0; i< syndromesReverse.length; i ++)
            syndromesReverse[i] = syndromes[syndromes.length - 1 - i];
-       int[] p = new int[N + 1];
-       p[0] = 1;
 
        int[] msgCorrected = new int[msg.length];
-       for(int i = 0;i < msg.length;i++)
+       for(i = 0;i < msg.length;i++)
            msgCorrected[i] = msg[i];
 
        int[] Lambda = this.berlekampMassey(syndromes);
        int[] LambdaReverse = new int[Lambda.length];
-       for(int i = 0; i < Lambda.length; i++)
-       {
+       System.out.println("Lambda");
+       System.out.println(Arrays.toString(Lambda));
+       for(i = 0; i < Lambda.length; i++)
+           LambdaReverse[i] = Lambda[Lambda.length - 1 - i];
 
-       }
+       int[] LambdaPrime = this.gf.polyDeriv(Lambda);
+
 
        int[] racines   = new int[Lambda.length - 1];
        int[] indices   = new int[Lambda.length - 1];
        int[] magnitude = new int[Lambda.length - 1];
 
+       int[] p = new int[N + 1];
+       p[0] = 1;
        int[] Omega = this.gf.polyMul(Lambda, syndromesReverse);
+       Omega = this.gf.polyDiv(Omega,p);
 
+       for(i = 0; i< msg.length; i++)
+       {
+           if(this.gf.polyEval(LambdaReverse, this.gf.gfPow(2,i)) == 0)
+           {
+              racines[k] = this.gf.gfInv(this.gf.gfPow(2,i));
+              indices[k] = msg.length - i - 1;
+              k ++;
+           }
+       }
+
+       for(i = 0; i < racines.length; i++)
+       {
+           X = racines[k];
+           O = this.gf.polyEval(Omega,X);
+           L2 = this.gf.gfInv(this.gf.polyEval(LambdaPrime,X));
+
+           a = this.gf.gfMul(O,L2);
+           msgCorrected[indices[i]] ^= this.gf.gfMul(this.gf.gfInv(X),a);
+       }
+       return msgCorrected;
     }
 }
