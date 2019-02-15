@@ -110,6 +110,8 @@ public class ReedSolomon {
 
     public int[] correctRs(int[] msg,int N)
     {
+        // N: nombre de symboles correcteur d'erreurs
+        // msg: message, liste d'octet
        int t = N / 2;
 
        int X,k = 0,i, O, L2, a;
