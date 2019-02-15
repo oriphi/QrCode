@@ -113,10 +113,21 @@ public class ReedSolomon {
         // N: nombre de symboles correcteur d'erreurs
         // msg: message, liste d'octet
        int t = N / 2;
+       boolean flag = true;
 
        int X,k = 0,i, O, L2, a;
 
        int[] syndromes = this.evalueSyndromes(msg,N);
+       for(i = 0; i < syndromes.length;i ++ )
+       {
+           if (syndromes[i] != 0)
+           {
+               flag = false;
+               break;
+           }
+       }
+       if (flag)
+           return msg;
        int[] syndromesReverse = new int[syndromes.length - 1];
        for(i =0; i< syndromesReverse.length; i ++)
            syndromesReverse[i] = syndromes[syndromes.length - 1 - i];
