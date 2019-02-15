@@ -21,7 +21,6 @@ public class ReedSolomon {
             syndromes[i + 1] = this.gf.polyEval(msg, this.gf.gfPow(2,i));
         }
 
-        System.out.println(Arrays.toString(syndromes));
         return syndromes;
     }
 
@@ -41,7 +40,7 @@ public class ReedSolomon {
     {
         int[] res;
         int i =p.length - 1;
-        while(p[i] != 0)i--;
+        while(p[i] == 0)i--;
         res = new int[i + 1];
         for(i = 0; i< res.length;i++)
             res[res.length - 1 -i] = p[i];
@@ -116,8 +115,6 @@ public class ReedSolomon {
        int X,k = 0,i, O, L2, a;
 
        int[] syndromes = this.evalueSyndromes(msg,N);
-       System.out.println("Syndromes:");
-        System.out.println(Arrays.toString(syndromes));
        int[] syndromesReverse = new int[syndromes.length - 1];
        for(i =0; i< syndromesReverse.length; i ++)
            syndromesReverse[i] = syndromes[syndromes.length - 1 - i];
@@ -126,10 +123,8 @@ public class ReedSolomon {
        for(i = 0;i < msg.length;i++)
            msgCorrected[i] = msg[i];
 
-       int[] Lambda = this.berlekampMassey(syndromes);
+       int[] Lambda = this.gf.stripPoly(this.berlekampMassey(syndromes));
        int[] LambdaReverse = new int[Lambda.length];
-       System.out.println("Lambda");
-       System.out.println(Arrays.toString(Lambda));
        for(i = 0; i < Lambda.length; i++)
            LambdaReverse[i] = Lambda[Lambda.length - 1 - i];
 
@@ -157,12 +152,18 @@ public class ReedSolomon {
 
        for(i = 0; i < racines.length; i++)
        {
-           X = racines[k];
+           X = racines[i];
            O = this.gf.polyEval(Omega,X);
            L2 = this.gf.gfInv(this.gf.polyEval(LambdaPrime,X));
 
            a = this.gf.gfMul(O,L2);
            msgCorrected[indices[i]] ^= this.gf.gfMul(this.gf.gfInv(X),a);
+       }
+       int[] syndtest = evalueSyndromes(msgCorrected, N);
+       for(i = 0; i < syndtest.length; i++)
+       {
+           if(syndtest[i] != 0)
+               throw new ArithmeticException("Trop d'erreurs, j'ai pas pu corriger");
        }
        return msgCorrected;
     }
