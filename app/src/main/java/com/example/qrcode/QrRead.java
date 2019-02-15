@@ -82,12 +82,12 @@ public class QrRead {
         /* --- Récupération des bits de format sur la colonne --- */
         for (int i = 0; i < this.qr_formatbits_size; i++) {
 
-            pos = formatbits_location[i];								              // récupération des indices
+            pos = formatbits_location[i];															// récupération des indices
             temp += Integer.toString(this.qr_data[pos[0]][pos[1]]);  	// récupération du bit et ajout au nombre binaire																	// stocké en string
         }
         formatbits[0] = Integer.parseInt(temp, 2);				      	// ajout à la variable de retour
-        formatbits[0] = formatbits[0] ^ formatbits_mask;		          // application du masque des bits de format
-        temp = "";														                        // remise à zéro de la variable temporaire
+        formatbits[0] = formatbits[0] ^ formatbits_mask;		      // application du masque des bits de format
+        temp = "";																								// remise à zéro de la variable temporaire
 
         /* --- Récupération des bits de format sur la ligne --- */
         for (int i = 0; i < this.qr_formatbits_size; i++) {
@@ -95,26 +95,23 @@ public class QrRead {
             pos = formatbits_location_bis[i];
             temp += Integer.toString(this.qr_data[pos[0]][pos[1]]);
         }
-        formatbits[1] = Integer.parseInt(temp, 2);				        // ajout à la variable de retour en deuxième position
+        formatbits[1] = Integer.parseInt(temp, 2);				       			// ajout à la variable de retour en deuxième position
         formatbits[1] = formatbits[1] ^ formatbits_mask;	          	// application du masque des bits de format
 
         return formatbits;
 
     }
 
-    private int getMask() {				// Renvoie le numéro correspodant au masque dans les bits de format
+    private int getMask(int formatbits) {						// Renvoie le numéro correspodant au masque dans les bits de format
         int mask;
-        int formatbits;
-        int mask_maskbits = 7168; 					// masque pour les bits en position 2, 3 et 4 (sur 15 en partant des poids forts)
+        int mask_maskbits = 7168; 									// masque pour les bits en position 2, 3 et 4 (sur 15 en partant des poids forts)
 
-        formatbits = this.getFormatBits()[0];		// récupération des bits de format
         mask = (formatbits & mask_maskbits) >> 10;	// récupération des bits {2, 3, 4 }
 
         return mask;
     }
 
-    private int getCorrectionValue() { // Renvoie le nombres d'octets de redondance
-        int formatbits = this.getFormatBits()[0];
+    public int getCorrectionValue(int formatbits) { // Renvoie le nombres d'octets de redondance
         int correctionValue = 0;
         int correctionLevel = formatbits >> 13;
 
@@ -135,20 +132,20 @@ public class QrRead {
         return correctionValue;
     }
 
-    public void unmaskData() {		   // Applique le masque décrit dans les bits de format au bit de données écrit dans qr_data_unmask
+    public void unmaskData(int formatbits) {		    // Applique le masque décrit dans les bits de format au bit de données écrit dans qr_data_unmask
         int mask;
         int mask_value;
-        mask = this.getMask(); // récupérer le masque
+        mask = this.getMask(formatbits); // récupérer le masque
 
-        for (int i = 0; i < this.qr_size; i++) {					                   // parcourir les bits
+        for (int i = 0; i < this.qr_size; i++) {					                   			 // parcourir les bits
             for (int j = 0; j < this.qr_size; j++) {
                 mask_value = getMaskValue(mask,i,j);
-                this.qr_data_unmask[i][j] = this.qr_data[i][j] ^ mask_value; // ou exclusif avec le masque
+                this.qr_data_unmask[i][j] = this.qr_data[i][j] ^ mask_value; 		   // ou exclusif avec le masque
             }
         }
     }
 
-    private int getMaskValue(int mask, int i, int j) {	 		// Renvoie la valeur du bit du masque mask à la position i,j
+    private int getMaskValue(int mask, int i, int j) {	 			// Renvoie la valeur du bit du masque mask à la position i,j
         int value = 0;							// par défaut la valeur est 0
         switch(mask) {							// selon le mask on met à 1 les positions validant la condition du masque
             case 0:
@@ -199,7 +196,7 @@ public class QrRead {
         return temp;
     }
 
-    private String getQRData() {		// Renvoie une String de tous les bits
+    private String getQRData() {			// Renvoie une String de tous les bits
 
         /* --- Variables --- */
         String data = "";
@@ -226,12 +223,12 @@ public class QrRead {
         return data;
     }
 
-    public int[] getQRBytes() { 		// Renvoie un tableau 1 octet = 1 nombre hexa
+    public int[] getQRBytes() { 		  // Renvoie un tableau 1 octet = 1 nombre hexa
 
         /* ---  Variables --- */
-        String data = this.getQRData();								// Récupère une chaîne de caractère contenant tous les bits
-        int[] QRbytes = new int[data.length() / 8];			// Init le tableau d'hexa à renvoyer
-        String octet = "";											// Var temporaire
+        String data = this.getQRData();											// Récupère une chaîne de caractère contenant tous les bits
+        int[] QRbytes = new int[data.length() / 8];					// Init le tableau d'hexa à renvoyer
+        String octet = "";																	// Var temporaire
 
         /* ---  Traitement --- */
         for (int i = 0; i < data.length(); i = i + 8) {	// Parcours octet par octet
@@ -240,12 +237,12 @@ public class QrRead {
             }
             // QRbytes[(int) (i / 8)] = Integer.toString(Integer.parseInt(octet, 2),16); // Convertion du binaire en hexa
             QRbytes[i / 8] = Integer.parseInt(octet, 2); // Convertion du binaire en int
-            octet = "";											 // RAZ de la var temp
+            octet = "";											 						 // RAZ de la var temp
         }
         return QRbytes;
     }
 
-    public String getQRMessage(int[] bytesList) {				// Renvoie le message décodé
+    public String getQRMessage(int[] bytesList, int formatbits) {							// Renvoie le message décodé
         /* --- Variables  --- */
         String msg ="";
         String bitList = bytesList2BinaryString(bytesList);
@@ -254,7 +251,7 @@ public class QrRead {
         int[] modeValues = new int[2];
         int nbCharInMode;
         int valueChar;
-        int nbCharTotal = 26 - this.getCorrectionValue();
+        int nbCharTotal = 26 - this.getCorrectionValue(formatbits);
 
 
         for(int x = 0; x < nbCharTotal;) {
@@ -281,7 +278,7 @@ public class QrRead {
         return msg;
     }
 
-    private String getNextChar(int mode, int valueChar) { // Renvoie le charactère codé selon mode dans bitList
+    private String getNextChar(int mode, int valueChar) { 		// Renvoie le charactère codé selon mode dans bitList
         String nextChar = "";
         switch(mode) {
             case 1:
@@ -300,11 +297,11 @@ public class QrRead {
         return nextChar;
     }
 
-    private String bit2NumericString(int valueChar) { // Renvoie un nombre entier sous forme de String
+    private String bit2NumericString(int valueChar) { 				// Renvoie un nombre entier sous forme de String
         return Integer.toString(valueChar);
     }
 
-    private String bit2AlphaNumString(int valueChar) { // Renvoie 2 caractères Alphanumériques
+    private String bit2AlphaNumString(int valueChar) { 				// Renvoie 2 caractères Alphanumériques
         String AlphaNumString;
         int a;
         int b;
@@ -317,15 +314,15 @@ public class QrRead {
         return AlphaNumString;
     }
 
-    private String bit2ByteString(int valueChar) {	// Renvoie un caractère ASCII
+    private String bit2ByteString(int valueChar) {						// Renvoie un caractère ASCII
         return Character.toString((char) valueChar);
     }
 
-    private String bit2KanjiString(int valueChar) { //TODO
+    private String bit2KanjiString(int valueChar) { 					//TODO
         return "Kanji";
     }
 
-    private int[] getModeValues(int mode) { // Renvoie les paramètres propres à un modes de codage
+    private int[] getModeValues(int mode) { 									// Renvoie les paramètres propres à un modes de codage
         int[] modeValues = new int[2]; // [0] 0: fin des données, 10: Numeric, 11: Alphanumeric,
         //     8: Byte, 13: Kanji
         // [1] longueur du code du nb de données codées dans le mode
@@ -372,6 +369,9 @@ public class QrRead {
         return this.qr_data[i][j];
     }
 
+    public void invertBit(int i, int j) {
+        this.qr_data[i][j] = (this.qr_data[i][j] + 1) % 2;
+    }
 
     /* ------------ TABLES DE CONVERSION ------------- */
 
