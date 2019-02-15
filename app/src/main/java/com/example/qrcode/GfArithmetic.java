@@ -1,5 +1,7 @@
 package com.example.qrcode;
 
+import java.util.Arrays;
+
 import static java.lang.Math.max;
 
 public class GfArithmetic {
@@ -89,6 +91,17 @@ public class GfArithmetic {
          return res;
      }
 
+     public int[] polyAddReverse(int[] p, int[] q)
+     {
+         int l = max(p.length,q.length);
+         int[] res = new int[l];
+         int i;
+         for(i = 0;i < p.length; i++)
+             res[i] = p[i];
+         for(i = 0;i < q.length; i++)
+             res[i] ^= q[i];
+         return res;
+     }
      public int[] polyScal(int[] p, int alpha)
      {
          // Routine de multiplication d'un poly par un scalaire (qui utilise une LUT)
@@ -108,19 +121,21 @@ public class GfArithmetic {
          int[] q1;
          int[] d;
          int[] m;
-
          int i;
+         int j;
 
-         // Pour éviter les effets de bords
-         System.arraycopy( p, 0, p1, 0, p.length );
-         System.arraycopy( q, 0, q1, 0, p.length );
+         p1 = this.polyScal(p,a);
+         q1 = this.polyScal(q,a);
+
 
          while(p1.length >= q1.length)
          {
             i = p1.length - q1.length;
             m = new int[i + 1];
+            for(j = 0; j < m.length;j++)
+                m[j] = 0;
             m[0] = 1;
-            d = this.polyScal(q,p1[0]);
+            d = this.polyScal(q1,p1[0]);
             d = this.polyMul(d,m);
             p1 = this.polyAdd(d,p1);
             p1 = this.stripPoly(p1);
@@ -131,6 +146,7 @@ public class GfArithmetic {
          }
          return p1;
      }
+
 
 
      public int[] polyMul(int[] p, int[] q)
@@ -148,7 +164,7 @@ public class GfArithmetic {
          for(i = 0; i < p.length; i++)
          {
              for(j = 0; j < q.length ; j++)
-                 res[i + j] ^= this.gfMul(p[i], q[i]);
+                 res[i + j] ^= this.gfMul(p[i], q[j]);
          }
          return res;
      }
@@ -164,6 +180,19 @@ public class GfArithmetic {
      }
 
 
+     public int[] polyDeriv(int[] p)
+     {
+         // Dérive le polynome p
+         int[] res = new int[p.length - 1];
+         for(int i = 0; i < p.length; i++)
+         {
+             if(i % 2 == 1)
+                 res[p.length - 1 - i] = p[p.length - 1  - i];
+
+         }
+         return this.stripPoly(res);
+     }
+
 
     /*
     *
@@ -178,8 +207,11 @@ public class GfArithmetic {
         // Enlève les zeros au début d'un polynome
         int[] res;
         int i = 0;
+        int j;
         while(p[i] == 0)i++;
-        System.arraycopy(p,0, res, i,p.length - i);
+        res = new int[p.length - i];
+        for(j = 0; j < res.length;j++)
+            res[j] = p[i + j];
         return res;
 
     }
@@ -214,8 +246,10 @@ public class GfArithmetic {
         int i = 0;
         while((y >> i) > 0)
         {
-            if((y & (1 << i)) != 0 )
+            if((y & (1 << i)) != 0 ) {
                 res ^= x << i;
+            }
+
             i++;
         }
         return res;
@@ -224,6 +258,6 @@ public class GfArithmetic {
     {
         // Véritable routine de multiplication, on prend le résultat modulo un entier générateur
         int res = gfMulOverflow(x,y);
-        return gfDivNoLUT(x,prime);
+        return gfDivNoLUT(res,prime);
     }
 }
