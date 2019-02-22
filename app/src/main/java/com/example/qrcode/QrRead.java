@@ -1,68 +1,70 @@
 package com.example.qrcode;
 
 import java.util.HashMap;
+import static com.example.qrcode.BCHDecoder.qrFormat;
 
 public class QrRead {
 
     /* ------------ VARIABLES -------------------- */
 
-    private int[][] qr_data ;
-    private int[][] qr_data_unmask;
+  private int[][] qr_data ;
+  private int[][] qr_data_unmask;
 
-    private int qr_size = 21;
-    private int qr_formatbits_size = 15;
+  private int qr_size = 21;
+  private int qr_formatbits_size = 15;
 
-    private HashMap<Integer, String> Int2AlphaNum;
+  private HashMap<Integer, String> Int2AlphaNum;
+
+  private ReedSolomon RS;
 
     /* ------------ CONSTRUCTEURS ---------------- */
 
-    public QrRead() {	// créer un qr code de valeurs prédéfinies (article wiki)
+  public QrRead() {	// créer un qr code de valeurs prédéfinies (article wiki)
 
-        this.qr_data = new int[][] {{1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1},
-                {1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1},
-                {1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1},
-                {1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1},
-                {1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1},
-                {1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1},
-                {1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1},
-                {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-                {1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1},
-                {0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0},
-                {0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1},
-                {0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1},
-                {1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0},
-                {1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0},
-                {1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0},
-                {1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0},
-                {1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0},
-                {1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0},
-                {1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1},
-                {1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0}};
-        this.qr_data_unmask = new int[qr_size][qr_size];
-        this.qr_formatbits_size = 15;
-        this.qr_size = 21;
-        this.initInt2AlphaNum();
-    }
+      this.qr_data = new int[][] {{1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1},
+              {1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1},
+              {1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1},
+              {1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1},
+              {1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1},
+              {1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1},
+              {1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1},
+              {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+              {1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1},
+              {0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0},
+              {0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1},
+              {0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1},
+              {1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0},
+              {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0},
+              {1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0},
+              {1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0},
+              {1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0},
+              {1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0},
+              {1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0},
+              {1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1},
+              {1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0}};
+      this.qr_data_unmask = new int[qr_size][qr_size];
+      this.qr_formatbits_size = 15;
+      this.qr_size = 21;
+      this.initInt2AlphaNum();
+  }
 
+  public QrRead(int[][] qrcode_table) {	// créer un QRcode carré à partir d'un tableau
+      this.RS = new ReedSolomon();
+      this.qr_size = qrcode_table.length;
+      this.qr_data = new int[this.qr_size][this.qr_size];
+      this.qr_data_unmask = new int[this.qr_size][this.qr_size];
+      for (int i = 0; i < this.qr_size; i++) {
+          for (int j = 0; j < this.qr_size; j++) {
+              this.qr_data[i][j] = qrcode_table[i][j];
+              this.qr_data_unmask[i][j] = 0;
+          }
+      }
 
-    public QrRead(int[][] qrcode_table) {	// créer un QRcode carré à partir d'un tableau
-
-        this.qr_size = qrcode_table.length;
-        this.qr_data = new int[this.qr_size][this.qr_size];
-        this.qr_data_unmask = new int[this.qr_size][this.qr_size];
-        for (int i = 0; i < this.qr_size; i++) {
-            for (int j = 0; j < this.qr_size; j++) {
-                this.qr_data[i][j] = qrcode_table[i][j];
-                this.qr_data_unmask[i][j] = 0;
-            }
-        }
-
-    }
+  }
 
     /* ------------ METHODES --------------------- */
 
-    public int[] getFormatBits() {		// Récupère les deux mots de format, applique le masque et renvoie deux entiers
+    private int[] getFormatBits() {		// Récupère les deux mots de format, applique le masque et renvoie deux entiers
 
         /* --- Variables --- */
         // emplacement des bits de format pour un QRcode 21x21
@@ -111,7 +113,7 @@ public class QrRead {
         return mask;
     }
 
-    public int getCorrectionValue(int formatbits) { // Renvoie le nombres d'octets de redondance
+    private int getCorrectionValue(int formatbits) { // Renvoie le nombres d'octets de redondance
         int correctionValue = 0;
         int correctionLevel = formatbits >> 13;
 
@@ -132,7 +134,7 @@ public class QrRead {
         return correctionValue;
     }
 
-    public void unmaskData(int formatbits) {		    // Applique le masque décrit dans les bits de format au bit de données écrit dans qr_data_unmask
+    private void unmaskData(int formatbits) {		    // Applique le masque décrit dans les bits de format au bit de données écrit dans qr_data_unmask
         int mask;
         int mask_value;
         mask = this.getMask(formatbits); // récupérer le masque
@@ -223,7 +225,7 @@ public class QrRead {
         return data;
     }
 
-    public int[] getQRBytes() { 		  // Renvoie un tableau 1 octet = 1 nombre hexa
+    private int[] getQRBytes() { 		  // Renvoie un tableau 1 octet = 1 nombre hexa
 
         /* ---  Variables --- */
         String data = this.getQRData();											// Récupère une chaîne de caractère contenant tous les bits
@@ -242,7 +244,7 @@ public class QrRead {
         return QRbytes;
     }
 
-    public String getQRMessage(int[] bytesList, int formatbits) {							// Renvoie le message décodé
+    private String getQRMessage(int[] bytesList, int formatbits) {							// Renvoie le message décodé
         /* --- Variables  --- */
         String msg ="";
         String bitList = bytesList2BinaryString(bytesList);
@@ -358,6 +360,47 @@ public class QrRead {
         }
         return bitList;
     }
+
+
+  public String getQrMessageDecode() {
+
+    /*
+    // erreurs
+    int[][] erreurs = new int[][]{{20, 8}, {19, 8}, {18, 8}, {17, 8}, {14, 14}, {1, 15}, {3, 20}, {12, 20}, {18, 15}};
+
+    for (int i = 0; i < erreurs.length; i++) {
+      this.invertBit(erreurs[i][0], erreurs[i][1]);
+    }
+    */
+
+    // Récupération des bits de format
+    int[] formatbits = this.getFormatBits();
+
+    // Correction des bits de formats
+    int formatbits_decode;
+    int[] formatbits_decode1 = qrFormat(formatbits[0]);
+    int[] formatbits_decode2 = qrFormat(formatbits[1]);
+
+    if (formatbits_decode1[1] <= formatbits_decode2[1]) // On garde le format qui a été le moins corrigé
+      formatbits_decode = formatbits_decode1[0];
+    else formatbits_decode = formatbits_decode2[0];
+
+
+    // Démasquage du QRcode (masque données)
+    this.unmaskData(formatbits_decode);
+    System.out.println("Data unmasked");
+    // Récupération des octets de données
+    int[] qrBytes = this.getQRBytes();
+
+    // Correction des données
+    int nbRedundantBytes = this.getCorrectionValue(formatbits_decode);
+    int[] qrBytes_decode = this.RS.correctRs(qrBytes, nbRedundantBytes);
+
+    // Traduction des données corrigées
+    String msg = this.getQRMessage(qrBytes_decode, formatbits_decode);
+
+    return msg;
+  }
 
     /* ------------ GETTERS / SETTERS ---------------- */
 
