@@ -13,8 +13,8 @@ public class QrMessage {
 
   /* ------------ CONSTRUCTEUR ---------------- */
 
-  public QrMessage() {
-    this.qrcode = new QrRead(); // TODO - construire un Qrcode à partir d'une liste externe
+  public QrMessage(int[][] qr_table) {
+    this.qrcode = new QrRead(qr_table);
     this.RS = new ReedSolomon();
     }
 
