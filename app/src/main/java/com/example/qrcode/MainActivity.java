@@ -40,11 +40,11 @@ public class MainActivity extends AppCompatActivity {
                                   {1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0}};
 
 
-  QrMessage qrcode = new QrMessage(qr_table);
+  QrRead qrcode = new QrRead(qr_table);
 
   public void sendMessage(View view) {
       Intent intent = new Intent(this, DisplayTestActivity.class);
-      String msg = qrcode.getQrMessage();
+      String msg = qrcode.getQrMessageDecode();
       intent.putExtra(EXTRA_MESSAGE, msg);
       startActivity(intent);
 
