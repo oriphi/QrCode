@@ -46,14 +46,14 @@ public class QrRead {
     }
 
 
-    public QrRead(int size) {	// créer un QRcode vide carré de taille size initialisé à 0
+    public QrRead(int size, int[][] qrcode_table) {	// créer un QRcode vide carré de taille size initialisé à 0
 
         this.qr_size = size;
         this.qr_data = new int[size][size];
         this.qr_data_unmask = new int[size][size];
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                this.qr_data[i][j] = 0;
+                this.qr_data[i][j] = qrcode_table[i][j];
                 this.qr_data_unmask[i][j] = 0;
             }
         }

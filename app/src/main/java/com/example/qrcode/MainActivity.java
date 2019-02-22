@@ -15,10 +15,13 @@ public class MainActivity extends AppCompatActivity {
       setContentView(R.layout.activity_main);
   }
 
-  /** Fonction de test de QrRead et QrMessage */
+  /** Fonction de test de QrRead et com.example.qrcode.QrMessage */
+
+  QrMessage qrcode = new QrMessage();
+
   public void sendMessage(View view) {
       Intent intent = new Intent(this, DisplayTestActivity.class);
-      String msg = "Test de l'activité";// TODO
+      String msg = qrcode.getQrMessage();// TODO
       intent.putExtra(EXTRA_MESSAGE, msg);
       startActivity(intent);
 
