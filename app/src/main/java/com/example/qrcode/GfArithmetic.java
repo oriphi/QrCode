@@ -202,6 +202,7 @@ public class GfArithmetic {
     *
      */
 
+
     public int[] stripPoly(int[] p )
     {
         // Enlève les zeros au début d'un polynome
@@ -215,7 +216,7 @@ public class GfArithmetic {
         return res;
 
     }
-    public int bitLength(int i){
+    private int bitLength(int i){
         // Renvoie la taille en nombre de bits de l'entier i
         int l = 0;
         while ((i >> l) > 0){l ++;}

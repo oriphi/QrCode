@@ -9,6 +9,7 @@ public class ReedSolomon {
     {
         this.gf = new GfArithmetic();
     }
+
     private int[] evalueSyndromes(int[] msg, int N)
     {
         // N: Nombre de symboles de redondance
@@ -24,7 +25,7 @@ public class ReedSolomon {
         return syndromes;
     }
 
-    public int[] polyShift(int[] p) throws ArithmeticException
+    private int[] polyShift(int[] p) throws ArithmeticException
     {
        int[] res = new int[p.length];
         if (p[p.length - 1] != 0)
