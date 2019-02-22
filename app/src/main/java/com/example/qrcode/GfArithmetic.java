@@ -208,6 +208,7 @@ public class GfArithmetic {
         int[] res;
         int i = 0;
         int j;
+        System.out.println(Arrays.toString(p));
         while(p[i] == 0)i++;
         res = new int[p.length - i];
         for(j = 0; j < res.length;j++)
