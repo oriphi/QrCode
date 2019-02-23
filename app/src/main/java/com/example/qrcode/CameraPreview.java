@@ -6,22 +6,26 @@ package com.example.qrcode;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Camera;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.hardware.camera2.*;
+import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
-
+import android.view.View;
 import org.w3c.dom.Text;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 public class CameraPreview extends AppCompatActivity {
@@ -43,14 +47,14 @@ public class CameraPreview extends AppCompatActivity {
     private CameraCaptureSession cameraCaptureSession;
     private CaptureRequest.Builder captureRequestBuilder;
     private CaptureRequest captureRequest;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera_preview);
 
+        // On demande aussi la permission d'écrire dans le stockage de l'appareil (dépend des fonctionnalités qu'on voudra implémenter
 
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST_CODE);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE}, CAMERA_REQUEST_CODE);
         cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         cameraFacing = CameraCharacteristics.LENS_FACING_BACK;
         textureView = (TextureView)  findViewById( R.id.textureView );
@@ -95,6 +99,27 @@ public class CameraPreview extends AppCompatActivity {
 
             }
         };
+
+
+        // Configuration du bouton
+        FloatingActionButton button = findViewById(R.id.floatingActionButton);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bitmap image = textureView.getBitmap();
+                int width = image.getWidth();
+                int height = image.getHeight();
+                Log.d("Camera Preview","Hauteur: " + Integer.toString(width));
+                Log.d("Camera Preview","Largeur: " + Integer.toString(height));
+                Log.d("Camera Preview","Premier Pixel: " + Integer.toString(image.getPixel(0,0)));
+
+                int[] rgb = ColorToRGB(image.getPixel(0,0));
+                Log.d("Camera Preview", "[a,r,g,b]" + Arrays.toString(rgb));
+
+
+            }
+        });
+
     }
     private void setUpCamera()
     {
@@ -211,5 +236,19 @@ public class CameraPreview extends AppCompatActivity {
         {
             e.printStackTrace();
         }
+
+    }
+
+    private int[] ColorToRGB(int color)
+    {
+        // Renvoie les 4 composantes du pixel
+        int a,r,g,b;
+        a = (color >> 24) & 0xff;
+        r = (color >> 16) & 0xff;
+        g = (color >> 8) & 0xff;
+        b = (color ) & 0xff;
+
+        return new int[]{a,r,g,b};
+
     }
 }
