@@ -107,10 +107,11 @@ public class CameraPreview extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Bitmap image = textureView.getBitmap();
+                image = image.createScaledBitmap(image, 600,800, false);
                 int width = image.getWidth();
                 int height = image.getHeight();
-                Log.d("Camera Preview","Hauteur: " + Integer.toString(width));
-                Log.d("Camera Preview","Largeur: " + Integer.toString(height));
+                Log.d("Camera Preview","Hauteur: " + Integer.toString(height));
+                Log.d("Camera Preview","Largeur: " + Integer.toString(width));
                 Log.d("Camera Preview","Premier Pixel: " + Integer.toString(image.getPixel(0,0)));
 
                 int[] rgb = ColorToRGB(image.getPixel(0,0));
