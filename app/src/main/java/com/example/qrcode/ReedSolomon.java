@@ -5,106 +5,73 @@ import java.util.Arrays;
 
 public class ReedSolomon {
     GfArithmetic gf;
-    public ReedSolomon()
+    ReedSolomon()
     {
         this.gf = new GfArithmetic();
     }
 
-    private int[] evalueSyndromes(int[] msg, int N)
+    public int[] evalueSyndromes(int[] msg, int N)
     {
         // N: Nombre de symboles de redondance
         //msg: liste comprenant le message et les symbole de redondance
 
         // On ajoute un syndrome nul pour une question d'indice
-        int[] syndromes = new int[N + 1];
+        int[] syndromes = new int[N];
         for(int i = 0; i < N; i++ )
         {
-            syndromes[i + 1] = this.gf.polyEval(msg, this.gf.gfPow(2,i));
+            syndromes[i] = this.gf.polyEval(msg, this.gf.gfPow(2,i));
         }
 
         return syndromes;
     }
 
-    private int[] polyShift(int[] p) throws ArithmeticException
+
+
+    private int[] bM(int[] syndromes)
     {
-       int[] res = new int[p.length];
-        if (p[p.length - 1] != 0)
-            throw new ArithmeticException("Overflow");
-       for(int i = 0; i < p.length - 1; i++)
-       {
-           res[i + 1] = p[i];
-       }
-       return res;
-    }
-
-    private int[] polyReverse(int[] p)
-    {
-        int[] res;
-        int i =p.length - 1;
-        while(p[i] == 0)i--;
-        res = new int[i + 1];
-        for(i = 0; i< res.length;i++)
-            res[res.length - 1 -i] = p[i];
-        return res;
-    }
-
-    private int[] berlekampMassey(int[] syndromes) throws ArithmeticException
-    {
-        int N = syndromes.length - 1;
-        int t =  N / 2;
-
-
-        // Initialisation des paramètres de l'algo
+        int K = 1;
         int L = 0;
-        int r = 0;
-        int d,b;
-
-        int[] B = new int[t + 1];
-        int[] Lambda = new int[t + 1];
-        int[] LambdaOld;
-        int[] p;
-
+        int e;
+        int N = syndromes.length;
+        int[] Lambda = new int[syndromes.length + 1];
+        int[] Lambda2 = new int[syndromes.length + 1];
+        int[] C = new int[syndromes.length + 1];
+        int[] C2 = new int[syndromes.length + 1];
         Lambda[0] = 1;
-        B[0] = 1;
-
-        int j;
-
-        while(r < N)
+        Lambda2[0] = 1;
+        C[1] = 1;
+        C2[1] = 1;
+        while(K <= N)
         {
-            d = 0;
-            r ++;
-            for(j = 0; j < L + 1; j++)
+            e = syndromes[ K - 1 ];
+            for(int i = 1; i < L + 1;i++)
             {
-                d ^= this.gf.gfMul(syndromes[r - j], Lambda[j]);
+                e ^= gf.gfMul(Lambda[i], syndromes[ K  - 1 - i ]);
             }
-            if(d != 0)
+
+            if(e != 0)
             {
-                // p = x.B[x].d
-               p = this.gf.polyMul(new int[]{1,0}, B);
-               try {
-                   p = this.polyShift(B);
-               }
-               catch (ArithmeticException e) {
-                   throw new ArithmeticException("Too much error");
-               }
-
-               p = this.gf.polyScal(p,d);
-               LambdaOld = Lambda; // Attention peut-être des problèmes de copie
-               Lambda = gf.polyAddReverse(p,Lambda);
-
-               if (2 * L <= r - 1)
-               {
-                   L = r - L;
-                   b = this.gf.gfInv(d);
-                   B = this.gf.polyScal(LambdaOld, b);
-               }
-               else
-               {
-                   B = this.polyShift(B);
-               }
+                Lambda2 = this.gf.polyAddReverse(Lambda, this.gf.polyScal(C,e));
+                if((2 * L ) < K)
+                {
+                    L = K  - L;
+                    C = gf.polyScal(Lambda, gf.gfInv(e));
+                }
+                Lambda = gf.polyCopy(Lambda2);
             }
+            // On shift C
+            C = this.gf.polyShift(C);
+            K++;
+            /*
+            System.out.println("e: " + Integer.toString(e));
+            System.out.println("L: " + Integer.toString(L));
+            System.out.println("K: " + Integer.toString(K));
+            System.out.println("Lambda: " + Arrays.toString(Lambda));
+            System.out.println("C: " + Arrays.toString(C));
+            */
         }
-        return this.polyReverse(Lambda);
+        System.out.println("Lambda " + Arrays.toString(this.gf.polyReverse(Lambda)));
+        return this.gf.polyReverse(Lambda);
     }
 
 
@@ -119,6 +86,7 @@ public class ReedSolomon {
        int X,k = 0,i, O, L2, a;
 
        int[] syndromes = this.evalueSyndromes(msg,N);
+       System.out.println("S : " + Arrays.toString(syndromes));
        for(i = 0; i < syndromes.length;i ++ )
        {
            if (syndromes[i] != 0)
@@ -127,9 +95,10 @@ public class ReedSolomon {
                break;
            }
        }
+       //On a pas trouvé d'erreurs
        if (flag)
            return msg;
-       int[] syndromesReverse = new int[syndromes.length - 1];
+       int[] syndromesReverse = this.gf.polyReverse(syndromes);
        for(i =0; i< syndromesReverse.length; i ++)
            syndromesReverse[i] = syndromes[syndromes.length - 1 - i];
 
@@ -137,7 +106,7 @@ public class ReedSolomon {
        for(i = 0;i < msg.length;i++)
            msgCorrected[i] = msg[i];
 
-       int[] Lambda = this.gf.stripPoly(this.berlekampMassey(syndromes));
+       int[] Lambda = this.gf.stripPoly(this.bM(syndromes));
        int[] LambdaReverse = new int[Lambda.length];
        for(i = 0; i < Lambda.length; i++)
            LambdaReverse[i] = Lambda[Lambda.length - 1 - i];
