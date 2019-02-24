@@ -3,16 +3,7 @@ package com.example.qrcode;
 public class QrRead21 extends QrRead {
 
   public QrRead21(int[][] qrcode_table) {	// créer un QRcode carré à partir d'un tableau
-    this.RS = new ReedSolomon();
-    this.qr_size = qrcode_table.length;
-    this.qr_data = new int[this.qr_size][this.qr_size];
-    this.qr_data_unmask = new int[this.qr_size][this.qr_size];
-    for (int i = 0; i < this.qr_size; i++) {
-      for (int j = 0; j < this.qr_size; j++) {
-        this.qr_data[i][j] = qrcode_table[i][j];
-        this.qr_data_unmask[i][j] = 0;
-      }
-    }
+    super(qrcode_table);
     System.out.println("QRCode 21x21 construit");
   }
 

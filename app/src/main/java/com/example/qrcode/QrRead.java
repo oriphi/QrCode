@@ -19,7 +19,7 @@ public class QrRead {
 
     /* ------------ CONSTRUCTEURS ---------------- */
 
-  public QrRead() {	// créer un qr code de valeurs prédéfinies (article wiki)
+  /*public QrRead() {	// créer un qr code de valeurs prédéfinies (article wiki)
 
       this.qr_data = new int[][] {{1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1},
               {1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1},
@@ -46,10 +46,19 @@ public class QrRead {
       this.qr_formatbits_size = 15;
       this.qr_size = 21;
       this.initInt2AlphaNum();
-  }
+  } */
 
   public QrRead(int[][] qrcode_table) {	// Implémentée dans les sous classes
-    System.out.println("ERROR : Appel au constructeur de la classe mère");
+    this.RS = new ReedSolomon();
+    this.qr_size = qrcode_table.length;
+    this.qr_data = new int[this.qr_size][this.qr_size];
+    this.qr_data_unmask = new int[this.qr_size][this.qr_size];
+    for (int i = 0; i < this.qr_size; i++) {
+      for (int j = 0; j < this.qr_size; j++) {
+        this.qr_data[i][j] = qrcode_table[i][j];
+        this.qr_data_unmask[i][j] = 0;
+      }
+    }
   }
 
     /* ------------ METHODES --------------------- */
