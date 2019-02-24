@@ -185,6 +185,13 @@ public class CameraPreview extends AppCompatActivity {
         closeBackgroundThread();
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        closeCamera();
+        closeBackgroundThread();
+    }
+
     private void closeCamera()
     {
         if(cameraCaptureSession != null)

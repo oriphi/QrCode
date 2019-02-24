@@ -26,6 +26,27 @@ public class ReedSolomon {
     }
 
 
+    public int[] encodeRs(String msg, int N)
+    {
+        // N nombre de symboles correcteur d'erreur
+        int[] res = new int[msg.length() + N];
+        int[] generateur = this.gf.polyGenerator(N);
+        int[] reste;
+        char c;
+        for(int i = 0; i < msg.length();i++) {
+            c = msg.charAt(i);
+            res[i] = (int) c;
+        }
+        reste = this.gf.polyDiv(res, generateur);
+        int k = 0;
+        //System.out.println("Reste: " + Arrays.toString(reste));
+        for(int i = reste.length - 1; i >= 0; i-- )
+        {
+            res[res.length  - 1 - k] = reste[i];
+            k ++;
+        }
+        return res;
+    }
 
     private int[] bM(int[] syndromes)
     {
@@ -33,16 +54,17 @@ public class ReedSolomon {
         int L = 0;
         int e;
         int N = syndromes.length;
-        int[] Lambda = new int[syndromes.length + 1];
-        int[] Lambda2 = new int[syndromes.length + 1];
-        int[] C = new int[syndromes.length + 1];
-        int[] C2 = new int[syndromes.length + 1];
+        int[] Lambda = new int[N + 1];
+        int[] Lambda2 = new int[N + 1];
+        int[] C = new int[N + 1];
+        int[] C2 = new int[N + 1];
         Lambda[0] = 1;
         Lambda2[0] = 1;
         C[1] = 1;
         C2[1] = 1;
         while(K <= N)
         {
+            //System.out.println("====== K = "+ Integer.toString(K) + " ======");
             e = syndromes[ K - 1 ];
             for(int i = 1; i < L + 1;i++)
             {
@@ -70,7 +92,7 @@ public class ReedSolomon {
             System.out.println("C: " + Arrays.toString(C));
             */
         }
-        System.out.println("Lambda " + Arrays.toString(this.gf.polyReverse(Lambda)));
+        //System.out.println("Lambda " + Arrays.toString(this.gf.polyReverse(Lambda)));
         return this.gf.polyReverse(Lambda);
     }
 
@@ -86,7 +108,7 @@ public class ReedSolomon {
        int X,k = 0,i, O, L2, a;
 
        int[] syndromes = this.evalueSyndromes(msg,N);
-       System.out.println("S : " + Arrays.toString(syndromes));
+       //System.out.println("S : " + Arrays.toString(syndromes));
        for(i = 0; i < syndromes.length;i ++ )
        {
            if (syndromes[i] != 0)
@@ -99,8 +121,6 @@ public class ReedSolomon {
        if (flag)
            return msg;
        int[] syndromesReverse = this.gf.polyReverse(syndromes);
-       for(i =0; i< syndromesReverse.length; i ++)
-           syndromesReverse[i] = syndromes[syndromes.length - 1 - i];
 
        int[] msgCorrected = new int[msg.length];
        for(i = 0;i < msg.length;i++)
@@ -121,7 +141,13 @@ public class ReedSolomon {
        int[] p = new int[N + 1];
        p[0] = 1;
        int[] Omega = this.gf.polyMul(Lambda, syndromesReverse);
+       /*
+       System.out.println("S = "+ Arrays.toString(syndromes));
+       System.out.println("Sr = "+ Arrays.toString(syndromesReverse));
+       System.out.println("Omega1 = "+ Arrays.toString(Omega));
+       */
        Omega = this.gf.polyDiv(Omega,p);
+       //System.out.println("Omega = "+ Arrays.toString(Omega));
 
        for(i = 0; i< msg.length; i++)
        {

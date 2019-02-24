@@ -291,4 +291,16 @@ public class GfArithmetic {
             res[res.length - 1 -i] = p[i];
         return res;
     }
+
+    public int[] polyGenerator(int N)
+    {
+        int[] res = new int[]{1};
+        int[] monome;
+        for(int i = 0 ; i < N; i++)
+        {
+            monome = new int[]{1, gfPow(2,i)};
+            res = polyMul(res, monome);
+        }
+        return res;
+    }
 }
