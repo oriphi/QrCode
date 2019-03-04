@@ -202,6 +202,7 @@ public class GfArithmetic {
     *
      */
 
+
     public int[] stripPoly(int[] p )
     {
         // Enlève les zeros au début d'un polynome
@@ -216,7 +217,7 @@ public class GfArithmetic {
         return res;
 
     }
-    public int bitLength(int i){
+    private int bitLength(int i){
         // Renvoie la taille en nombre de bits de l'entier i
         int l = 0;
         while ((i >> l) > 0){l ++;}
@@ -260,5 +261,47 @@ public class GfArithmetic {
         // Véritable routine de multiplication, on prend le résultat modulo un entier générateur
         int res = gfMulOverflow(x,y);
         return gfDivNoLUT(res,prime);
+    }
+    public int[] polyCopy(int[] p)
+    {
+        int[] res = new int[p.length];
+        for(int i = 0; i < p.length; i++)
+        {
+            res[i] = p[i];
+        }
+        return res;
+    }
+    public int[] polyShift(int[] p) throws ArithmeticException
+    {
+        int[] res = new int[p.length];
+        if (p[p.length - 1] != 0)
+            throw new ArithmeticException("Overflow");
+        for(int i = 0; i < p.length - 1; i++)
+        {
+            res[i + 1] = p[i];
+        }
+        return res;
+    }
+    public int[] polyReverse(int[] p)
+    {
+        int[] res;
+        int i =p.length - 1;
+        while(p[i] == 0)i--;
+        res = new int[i + 1];
+        for(i = 0; i< res.length;i++)
+            res[res.length - 1 -i] = p[i];
+        return res;
+    }
+
+    public int[] polyGenerator(int N)
+    {
+        int[] res = new int[]{1};
+        int[] monome;
+        for(int i = 0 ; i < N; i++)
+        {
+            monome = new int[]{1, gfPow(2,i)};
+            res = polyMul(res, monome);
+        }
+        return res;
     }
 }
