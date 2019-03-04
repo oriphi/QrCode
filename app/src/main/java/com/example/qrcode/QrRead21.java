@@ -4,6 +4,7 @@ public class QrRead21 extends QrRead {
 
   public QrRead21(int[][] qrcode_table) {	// créer un QRcode carré à partir d'un tableau
     super(qrcode_table);
+    this.qr_nbDataBytes = 26;
     System.out.println("QRCode 21x21 construit");
   }
 
@@ -32,6 +33,27 @@ public class QrRead21 extends QrRead {
     }
 
     return data;
+  }
+
+  protected int getCorrectionValue(int formatbits) { // Renvoie le nombres d'octets de redondance
+    int correctionValue = 0;
+    int correctionLevel = formatbits >> 13;
+
+    switch(correctionLevel) {
+      case 1 :
+        correctionValue = 7;
+        break;
+      case 0 :
+        correctionValue = 10;
+        break;
+      case 3 :
+        correctionValue = 13;
+        break;
+      case 2 :
+        correctionValue = 17;
+        break;
+    }
+    return correctionValue;
   }
 
 }

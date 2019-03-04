@@ -12,41 +12,13 @@ public class QrRead {
 
   protected int qr_size;
   private int qr_formatbits_size = 15;
+  protected int qr_nbDataBytes;
 
   private HashMap<Integer, String> Int2AlphaNum;
 
   protected ReedSolomon RS;
 
     /* ------------ CONSTRUCTEURS ---------------- */
-
-  /*public QrRead() {	// créer un qr code de valeurs prédéfinies (article wiki)
-
-      this.qr_data = new int[][] {{1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1},
-              {1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1},
-              {1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1},
-              {1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1},
-              {1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1},
-              {1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1},
-              {1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1},
-              {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-              {1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1},
-              {0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0},
-              {0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1},
-              {0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1},
-              {1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0},
-              {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0},
-              {1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0},
-              {1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0},
-              {1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0},
-              {1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0},
-              {1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0},
-              {1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1},
-              {1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0}};
-      this.qr_data_unmask = new int[qr_size][qr_size];
-      this.qr_formatbits_size = 15;
-      this.qr_size = 21;
-      this.initInt2AlphaNum();
-  } */
 
   public QrRead(int[][] qrcode_table) {	// Implémentée dans les sous classes
     this.RS = new ReedSolomon();
@@ -112,25 +84,9 @@ public class QrRead {
       return mask;
   }
 
-  private int getCorrectionValue(int formatbits) { // Renvoie le nombres d'octets de redondance
-      int correctionValue = 0;
-      int correctionLevel = formatbits >> 13;
-
-      switch(correctionLevel) {
-          case 1 :
-              correctionValue = 7;
-              break;
-          case 0 :
-              correctionValue = 10;
-              break;
-          case 3 :
-              correctionValue = 13;
-              break;
-          case 2 :
-              correctionValue = 17;
-              break;
-      }
-      return correctionValue;
+  protected int getCorrectionValue(int formatbits) { // Renvoie le nombres d'octets de redondance
+      System.out.println("ERROR : appel à getCorrectionValue dans la classe mère");
+      return -1;
   }
 
   private void unmaskData(int formatbits) {		    // Applique le masque décrit dans les bits de format au bit de données écrit dans qr_data_unmask
@@ -230,7 +186,7 @@ public class QrRead {
       int[] modeValues = new int[2];
       int nbCharInMode;
       int valueChar;
-      int nbCharTotal = 26 - this.getCorrectionValue(formatbits);
+      int nbCharTotal = this.qr_nbDataBytes - this.getCorrectionValue(formatbits);
 
       for(int x = 0; x < nbCharTotal;) {
 
