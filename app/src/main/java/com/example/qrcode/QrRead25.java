@@ -5,7 +5,7 @@ public class QrRead25 extends QrRead {
   public QrRead25(int[][] qrcode_table) {	// créer un QRcode carré à partir d'un tableau
     super(qrcode_table);
     this.qr_nbDataBytes = 44;
-    System.out.println("QRCode 25x25 construit");
+    System.out.println("QRCode 25x25 construit\n");
   }
 
   protected String getQRData() {			// Renvoie une String de tous les bits
@@ -40,18 +40,18 @@ public class QrRead25 extends QrRead {
     int correctionValue = 0;
     int correctionLevel = formatbits >> 13;
 
-    switch(correctionLevel) {
+    switch(correctionLevel) { //nb de bytes de redondance (total - bytes de données)
       case 1 :
-        correctionValue = 16;
+        correctionValue = 10;
         break;
       case 0 :
-        correctionValue = 22;
+        correctionValue = 16;
         break;
       case 3 :
-        correctionValue = 28;
+        correctionValue = 22;
         break;
       case 2 :
-        correctionValue = 34;
+        correctionValue = 28;
         break;
     }
     return correctionValue;

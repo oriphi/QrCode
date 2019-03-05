@@ -57,11 +57,11 @@ public class BCHDecoder {
         int g = 0x537; // Polynome générateur du code BCH
         int res = bchCheck(format, g);
         if (res == 0) {
-            System.out.println("Aucune erreur detectée !");
+            System.out.println("[BCH] Aucune erreur detectée !");
             // La transmission s'est bien faite, on a pas détecté d'errreur dans le format
             return new int[]{format,0};
         }
-        System.out.println("Attention passage en mode correcteur !");
+        System.out.println("[BCH] Attention passage en mode correcteur !");
 
         int[] tests = new int[32]; // On va encoder tout les mots de 10 bits et regarder lequel est le plus proche
         int testCode;

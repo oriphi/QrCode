@@ -93,6 +93,7 @@ public class QrRead {
       int mask;
       int mask_value;
       mask = this.getMask(formatbits); // récupérer le masque
+    System.out.println("Masque : " + mask);
 
       for (int i = 0; i < this.qr_size; i++) {					                   			 // parcourir les bits
           for (int j = 0; j < this.qr_size; j++) {
@@ -192,12 +193,14 @@ public class QrRead {
 
           /* Récupération des 4 premiers bits de mode */
           mode = Integer.parseInt(bitList.substring(ind, ind + 4),2);
+          System.out.println("Mode des données : " + mode);
           modeValues = getModeValues(mode);
           if(modeValues[0] == 0)  break;	// si on a le caractère de fin de données on sort
           ind = ind + 4;
 
           /* Récupération du nombre de caractères dans le mode donné */
           nbCharInMode = Integer.parseInt(bitList.substring(ind, ind + modeValues[1]), 2);
+          System.out.println("Nombre de char dans le mode : " + nbCharInMode);
           ind += modeValues[1];
 
           /* Récupération des caractères */
@@ -258,8 +261,8 @@ public class QrRead {
 
   private int[] getModeValues(int mode) { 									// Renvoie les paramètres propres à un modes de codage
       int[] modeValues = new int[2]; // [0] 0: fin des données, 10: Numeric, 11: Alphanumeric,
-      //     8: Byte, 13: Kanji
-      // [1] longueur du code du nb de données codées dans le mode
+                                     //     8: Byte, 13: Kanji
+                                     // [1] longueur du code du nb de données codées dans le mode
       switch(mode) {
           case 0:
               modeValues[0] = 0;
@@ -306,6 +309,7 @@ public class QrRead {
 
     // Récupération des bits de format
     int[] formatbits = this.getFormatBits();
+    System.out.println("Bits de formats : " + Integer.toBinaryString(formatbits[0]));
 
     // Correction des bits de formats
     int formatbits_decode;
@@ -315,7 +319,7 @@ public class QrRead {
     if (formatbits_decode1[1] <= formatbits_decode2[1]) // On garde le format qui a été le moins corrigé
       formatbits_decode = formatbits_decode1[0];
     else formatbits_decode = formatbits_decode2[0];
-
+    System.out.println("Bits de formats corrigés : " + Integer.toBinaryString(formatbits_decode));
 
     // Démasquage du QRcode (masque données)
     this.unmaskData(formatbits_decode);
@@ -324,6 +328,7 @@ public class QrRead {
     int[] qrBytes = this.getQRBytes();
 
     // Correction des données
+    System.out.println("Niveau de correction : " + (formatbits_decode >> 13));
     int nbRedundantBytes = this.getCorrectionValue(formatbits_decode);
     int[] qrBytes_decode = this.RS.correctRs(qrBytes, nbRedundantBytes);
 
@@ -337,6 +342,18 @@ public class QrRead {
 
   public int[][] getQRcode() {
       return this.qr_data;
+  }
+  public void getQRcode_unmasked() {
+    System.out.print("[");
+    for(int i = 0; i< this.qr_size; i++) {
+      System.out.print("[");
+      for(int j = 0; j < this.qr_size; j++) {
+        System.out.print(this.qr_data_unmask[i][j]);
+        if(j < this.qr_size - 1) System.out.print(",");
+      }
+      System.out.println("]");
+    }
+    System.out.println("]");
   }
 
   public int getBit(int i, int j) {
