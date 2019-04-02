@@ -1,5 +1,7 @@
 package com.example.qrcode;
 
+import com.example.qrcode.QrReadPackage.*; // on importe toutes les classes de QrReadPackage
+
 public class QrFactory {
 
   public QrRead getQrType(int[][] qr_table) {
@@ -30,6 +32,10 @@ public class QrFactory {
       case 21:  return new QrRead21(qr_table);
 
       case 25:  return new QrRead25(qr_table);
+
+      case 29:  return new QrRead29(qr_table);
+
+      case 33:  return new QrRead33(qr_table);
 
       default:  System.out.println("ERROR : type de QrCode non implémenté");
                 return new QrRead21(qr_default);
