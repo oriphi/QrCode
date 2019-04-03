@@ -40,7 +40,7 @@ public class QrRead {
 
   private int[] getFormatBits()                                     // Récupère les deux mots de format, applique le masque et renvoie deux entiers
   {
-
+    System.out.println("  [getFormatBits] ");
       /* --- Variables --- */
       // emplacement des bits de format pour un QRcode 21x21
       int[][] formatbits_location = new int[][] {{ this.qr_size - 1, 8}, {this.qr_size - 2, 8}, {this.qr_size - 3, 8}, {this.qr_size - 4, 8}, {this.qr_size - 5, 8}, {this.qr_size - 6, 8}, {this.qr_size - 7,8},
@@ -57,6 +57,7 @@ public class QrRead {
       int[] pos;
 
       /* --- Récupération des bits de format sur la colonne --- */
+
       for (int i = 0; i < this.qr_formatbits_size; i++) {
 
           pos = formatbits_location[i];															// récupération des indices
@@ -76,7 +77,7 @@ public class QrRead {
       }
       formatbits[1] = Integer.parseInt(temp, 2);				       			// ajout à la variable de retour en deuxième position
       formatbits[1] = formatbits[1] ^ formatbits_mask;	          	// application du masque des bits de format
-
+    System.out.println("Brut: " + Integer.toBinaryString(formatbits[0]));
       return formatbits;
 
   }
@@ -101,6 +102,7 @@ public class QrRead {
   {
       int mask;
       int mask_value;
+    System.out.println("\n  [ unmaskData ] ");
       mask = this.getMask(formatbits); // récupérer le masque
     System.out.println("Masque : " + mask);
 
@@ -196,6 +198,7 @@ public class QrRead {
 
   private String getQRMessage(int[] bytesList, int formatbits)      // Renvoie le message à partir de la liste d'octet corrigée
   {
+    System.out.println("\n  [ getQRMessage ]");
       /* --- Variables  --- */
       String msg ="";
       String bitList = bytesList2BinaryString(bytesList);
@@ -391,6 +394,15 @@ public class QrRead {
     System.out.println("dé-entrelaçement : " + count + " / " + this.qr_nbBytes);
 
     /* --- Correction --- */
+    int[][] bytesShort_corr = new int[nbShortBlocs][lenShortBlocs + lenCorrect]; // Stockage des versions corrigées
+    int[][] bytesLong_corr = new int[nbLongBlocs][lenLongBlocs + lenCorrect];
+
+    for(int i = 0; i < nbShortBlocs; i++) { // Correction blocs courts
+      bytesShort_corr[i] = this.RS.correctRs(bytesShort[i], lenCorrect);
+    }
+    for(int i = 0; i < nbLongBlocs; i++) { // Correction blocs longs
+      bytesLong_corr[i] = this.RS.correctRs(bytesLong[i], lenCorrect);
+    }
 
 
     /* --- Assembler --- */
@@ -402,13 +414,13 @@ public class QrRead {
     count = 0;     // position d'ajout dans dataBytes
     for(; i < nbShortBlocs; i++){
       for(j = 0; j < lenShortBlocs; j++) {
-        dataBytes[count] = bytesShort[i][j]; // Ajout des blocs courts
+        dataBytes[count] = bytesShort_corr[i][j]; // Ajout des blocs courts
         count++;
       }
     }
     for(; i < nbBlocs; i++){
       for(j = 0; j < lenLongBlocs; j++) {
-        dataBytes[count] = bytesLong[i - nbShortBlocs][j]; // Ajout des blocs longs
+        dataBytes[count] = bytesLong_corr[i - nbShortBlocs][j]; // Ajout des blocs longs
         count++;
       }
     }
@@ -416,12 +428,12 @@ public class QrRead {
     return dataBytes;
   }
 
-
-  public String getQrMessageDecode() {
+  public String getQrMessageDecode()                                 // Procédure Générale, renvoie le message décodé
+  {
 
     // Récupération des bits de format
     int[] formatbits = this.getFormatBits();
-    System.out.println("Bits de formats : " + Integer.toBinaryString(formatbits[0]));
+
 
     // Correction des bits de formats
     int formatbits_decode;
@@ -431,18 +443,18 @@ public class QrRead {
     if (formatbits_decode1[1] <= formatbits_decode2[1]) // On garde le format qui a été le moins corrigé
       formatbits_decode = formatbits_decode1[0];
     else formatbits_decode = formatbits_decode2[0];
-    System.out.println("Bits de formats corrigés : " + Integer.toBinaryString(formatbits_decode));
+    System.out.println("Corr: " + Integer.toBinaryString(formatbits_decode));
 
     // Démasquage du QRcode (masque données)
     this.unmaskData(formatbits_decode);
 
     // Récupération des octets de données
     int[] qrBytes = this.getQRBytes();
-    System.out.println("Bytes non corrigés : " + Arrays.toString(qrBytes));
+    System.out.println("\nBytes non corrigés : " + Arrays.toString(qrBytes));
 
     // Correction des données
     int nbRedundantBytes = this.getCorrectionValue(formatbits_decode)[0];
-    System.out.println("Niveau de correction : " + (formatbits_decode >> 13) + " (" + nbRedundantBytes + " / " + qr_nbBytes + " octets)");
+    System.out.println("Niveau de correction : " + (formatbits_decode >> 13) + " (" + nbRedundantBytes + " / " + this.qr_nbBytes + " octets)");
     int[] qrBytes_decode = this.correctMessage(qrBytes, formatbits_decode);
 
 
