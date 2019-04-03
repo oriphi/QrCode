@@ -9,16 +9,17 @@ public class QrRead {
 
     /* ------------ VARIABLES -------------------- */
 
-  protected int[][] qr_data ;
-  protected int[][] qr_data_unmask;
+  private int[][] qr_data ;
+  private int[][] qr_data_unmask;
 
-  protected int qr_size;
+  private int qr_size;
+  private int qr_version;
   private int qr_formatbits_size = 15;
   protected int qr_nbBytes;
 
   private HashMap<Integer, String> Int2AlphaNum;
 
-  protected ReedSolomon RS;
+  private ReedSolomon RS;
 
     /* ------------ CONSTRUCTEURS ---------------- */
 
@@ -26,6 +27,7 @@ public class QrRead {
   {
     this.RS = new ReedSolomon();
     this.qr_size = qrcode_table.length;
+    this.qr_version = (this.qr_size - 17) / 4;
     this.qr_data = new int[this.qr_size][this.qr_size];
     this.qr_data_unmask = new int[this.qr_size][this.qr_size];
     for (int i = 0; i < this.qr_size; i++) {
@@ -297,27 +299,33 @@ public class QrRead {
                                      //     8: Byte, 13: Kanji
                                      // [1] longueur du code du nb de données codées dans le mode
       switch(mode) {
-          case 0:
-              modeValues[0] = 0;
-              modeValues[1] = 0;
-              break;
           case 1:
               modeValues[0] = 10;
-              modeValues[1] = 10;
+              if(this.qr_version <= 9)       modeValues[1] = 10;
+              else if(this.qr_version <= 26) modeValues[1] = 12;
+              else                           modeValues[1] = 14;
               break;
           case 2:
               modeValues[0] = 11;
-              modeValues[1] = 9;
+              if(this.qr_version <= 9)       modeValues[1] = 9;
+              else if(this.qr_version <= 26) modeValues[1] = 11;
+              else                           modeValues[1] = 13;
               break;
           case 4:
               modeValues[0] = 8;
-              modeValues[1] = 8;
+              if(this.qr_version <= 9)       modeValues[1] = 8;
+              else if(this.qr_version <= 26) modeValues[1] = 16;
+              else                           modeValues[1] = 16;
+
               break;
           case 8:
               modeValues[0] = 13;
-              modeValues[1] = 8;
+              if(this.qr_version <= 9)       modeValues[1] = 8;
+              else if(this.qr_version <= 26) modeValues[1] = 10;
+              else                           modeValues[1] = 12;
               break;
       }
+      System.out.println(Arrays.toString(modeValues));
       return modeValues;
   }
 
