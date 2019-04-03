@@ -343,12 +343,12 @@ public class QrRead {
     int nbLongBlocs = this.qr_nbBytes % nbBlocs;
     int nbShortBlocs = nbBlocs - nbLongBlocs;
     int lenShortBlocs = nbDataBytes / nbBlocs;
-    int lenLongBlocs = nbDataBytes - nbShortBlocs * lenShortBlocs;
+    int lenLongBlocs = (nbLongBlocs != 0)? (nbDataBytes - nbShortBlocs * lenShortBlocs) / nbLongBlocs : 0;
     int lenCorrect = nbRedundantBytes / nbBlocs;
 
     System.out.println("\n  [ correctMessage() ]  ");
     System.out.println("Nb Blocs: " + nbBlocs + " --  Short/Long : " + nbShortBlocs + "(" + lenShortBlocs + ") / " + nbLongBlocs + "(" + lenLongBlocs + ")");
-    System.out.println("nbdatabytes : " + nbDataBytes);
+
 
     /* --- Dé-entrelacement --- */
     int count = 0; // indice sur qrBytes
@@ -376,7 +376,8 @@ public class QrRead {
         count++;
       }
     }
-
+    System.out.println("nbdatabytes : " + nbDataBytes);
+    System.out.println("count fin data : " + count);
     // -- Parcours des corrections entrelacées --
 
     // Tous font la même taille
@@ -397,10 +398,13 @@ public class QrRead {
     int[][] bytesShort_corr = new int[nbShortBlocs][lenShortBlocs + lenCorrect]; // Stockage des versions corrigées
     int[][] bytesLong_corr = new int[nbLongBlocs][lenLongBlocs + lenCorrect];
 
+
     for(int i = 0; i < nbShortBlocs; i++) { // Correction blocs courts
+      System.out.println("\nCorr bloc court : " + i);
       bytesShort_corr[i] = this.RS.correctRs(bytesShort[i], lenCorrect);
     }
     for(int i = 0; i < nbLongBlocs; i++) { // Correction blocs longs
+      System.out.println("\nCorr bloc long  : " + i);
       bytesLong_corr[i] = this.RS.correctRs(bytesLong[i], lenCorrect);
     }
 
@@ -424,7 +428,7 @@ public class QrRead {
         count++;
       }
     }
-    System.out.println("Databytes    : " + Arrays.toString(dataBytes));
+    System.out.println("\nDatabytes    : " + Arrays.toString(dataBytes));
     return dataBytes;
   }
 
@@ -454,7 +458,7 @@ public class QrRead {
 
     // Correction des données
     int nbRedundantBytes = this.getCorrectionValue(formatbits_decode)[0];
-    System.out.println("Niveau de correction : " + (formatbits_decode >> 13) + " (" + nbRedundantBytes + " / " + this.qr_nbBytes + " octets)");
+    System.out.println("Niveau de correction  (corr / tous) : " + (formatbits_decode >> 13) + " (" + nbRedundantBytes + " / " + this.qr_nbBytes + " octets)");
     int[] qrBytes_decode = this.correctMessage(qrBytes, formatbits_decode);
 
 

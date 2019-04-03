@@ -37,6 +37,10 @@ public class QrFactory {
 
       case 33:  return new QrRead33(qr_table);
 
+      case 37:  return new QrRead37(qr_table);
+
+      case 41:  return new QrRead41(qr_table);
+
       default:  System.out.println("ERROR : type de QrCode non implémenté");
                 return new QrRead21(qr_default);
 
