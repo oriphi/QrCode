@@ -117,6 +117,8 @@ public class ReedSolomon {
                break;
            }
        }
+      System.out.println("[RS] S : " + Arrays.toString(syndromes)); //TODO
+
        //On a pas trouvé d'erreurs
        if (flag)
            return msg;
@@ -155,10 +157,11 @@ public class ReedSolomon {
            {
               racines[k] = this.gf.gfInv(this.gf.gfPow(2,i));
               indices[k] = msg.length - i - 1;
+              System.out.println("indices[k] :" + indices[k]); //TODO
               k ++;
            }
        }
-
+        System.out.println("[RS] indices : " + Arrays.toString(indices)); //TODO
        for(i = 0; i < racines.length; i++)
        {
            X = racines[i];

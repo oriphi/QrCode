@@ -1,10 +1,13 @@
-package com.example.qrcode;
+package com.example.qrcode.QrReadPackage;
+
+import com.example.qrcode.QrRead;
 
 public class QrRead25 extends QrRead {
 
   public QrRead25(int[][] qrcode_table) {	// créer un QRcode carré à partir d'un tableau
     super(qrcode_table);
-    System.out.println("QRCode 25x25 construit");
+    this.qr_nbBytes = 44;
+    System.out.println("QRCode 25x25 construit\n");
   }
 
   protected String getQRData() {			// Renvoie une String de tous les bits
@@ -33,5 +36,26 @@ public class QrRead25 extends QrRead {
     }
 
     return data;
+  }
+
+  protected int[] getCorrectionValue(int formatbits) { // Renvoie le nombres d'octets de redondance
+    int[] correctionValue = new int[] {-1, -1};
+    int correctionLevel = formatbits >> 13;
+
+    switch(correctionLevel) { //nb de bytes de redondance (total - bytes de données); nb de blocs
+      case 1 : // Low
+        correctionValue = new int[] {10,1};
+        break;
+      case 0 :
+        correctionValue = new int[] {16,1};
+        break;
+      case 3 :
+        correctionValue = new int[] {22,1};
+        break;
+      case 2 :
+        correctionValue = new int[] {28,1};
+        break;
+    }
+    return correctionValue;
   }
 }
