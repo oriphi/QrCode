@@ -117,7 +117,7 @@ public class ReedSolomon {
                break;
            }
        }
-      System.out.println("[RS] S : " + Arrays.toString(syndromes)); //TODO
+      System.out.println("[RS] syndromes : " + Arrays.toString(syndromes)); //TODO
 
        //On a pas trouvé d'erreurs
        if (flag)
@@ -157,7 +157,7 @@ public class ReedSolomon {
            {
               racines[k] = this.gf.gfInv(this.gf.gfPow(2,i));
               indices[k] = msg.length - i - 1;
-              System.out.println("indices[k] :" + indices[k]); //TODO
+              //System.out.println("indices[k] :" + indices[k]);
               k ++;
            }
        }
