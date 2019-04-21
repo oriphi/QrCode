@@ -70,8 +70,10 @@ public class BCHDecoder {
         for(i = 0;i < 32; i++)
         {
             testCode = (i << 10) ^ bchCheck(i << 10, g);
+            //System.out.print(String.format("%15s", Integer.toBinaryString(testCode)).replace(" ", "0"));
             // On récupère sa distance au mot lu sur le QR Code
             tests[i] = poids(testCode ^ format);
+            //System.out.println(" -- poids : " + tests[i]);
         }
 
         // Maintenant on va chercher le mot le plus proche
