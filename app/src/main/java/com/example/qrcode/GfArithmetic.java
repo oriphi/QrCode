@@ -181,7 +181,7 @@ public class GfArithmetic {
      {
          // Dérive le polynôme p
          int[] res = new int[p.length - 1];
-         for(int i = 1; i < p.length; i++)
+         for(int i = 1; i < p.length + 1; i++)
          {
              if(i % 2 == 0)
                  res[i - 2] = p[i - 1];
@@ -205,7 +205,9 @@ public class GfArithmetic {
         int[] res;
         int i = p.length -1;
         int j;
-        while(p[i] == 0)i--;
+        while(i >= 0 && p[i] == 0)i--;
+        if(i == -1)
+            return new int[]{0};
         res = new int[i + 1];
         for(j = 0; j < res.length;j++)
             res[j] = p[j];
