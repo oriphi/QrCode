@@ -223,14 +223,9 @@ public class ReedSolomon {
                 throw new ArithmeticException("Trop d'erreurs, j'ai pas pu corriger");
             }
         }
-        if(!flag)
-            System.out.printf("TROP D'ERREURS!!!!! \n");
-
-        /*
-        for (i = pmsg.length - 1; i >= 0; i--) {
-            pmsg[pmsg.length - i] = msgCorrected[i];
+        for (i = 0; i < pmsg.length; i++) {
+            pmsg[pmsg.length - 1 - i] = msgCorrected[i];
         }
-        */
         return msgCorrected;
     }
 }
