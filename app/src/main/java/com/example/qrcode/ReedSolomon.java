@@ -73,6 +73,7 @@ public class ReedSolomon {
         Lambda2[0] = 1;
         C[1] = 1;
         C2[1] = 1;
+        int z;
 
         // Si les syndromes sont tous nuls on passe
         boolean f = true;
@@ -89,7 +90,11 @@ public class ReedSolomon {
             //System.out.println("====== K = "+ Integer.toString(K) + " ======");
             e = syndromes[K - 1];
             for (int i = 1; i < L + 1; i++) {
-                e ^= gf.gfMul(Lambda[i], syndromes[K - 1 - i]);
+                if(i >= Lambda.length)
+                    z = 0;
+                else
+                    z = Lambda[i];
+                e ^= gf.gfMul(z, syndromes[K - 1 - i]);
             }
 
             if (e != 0) {
@@ -213,14 +218,22 @@ public class ReedSolomon {
         }
         System.out.println("msgCorr: " + Arrays.toString(msgCorrected));
         int[] syndtest = evalueSyndromes(msgCorrected, N);
+        flag = true;
         for (i = 0; i < syndtest.length; i++) {
-            if (syndtest[i] != 0)
-                throw new ArithmeticException("Trop d'erreurs, j'ai pas pu corriger");
+            if (syndtest[i] != 0) {
+                //throw new ArithmeticException("Trop d'erreurs, j'ai pas pu corriger");
+                flag = false;
+                break;
+            }
         }
+        if(!flag)
+            System.out.printf("TROP D'ERREURS!!!!! \n");
 
+        /*
         for (i = pmsg.length - 1; i >= 0; i--) {
             pmsg[pmsg.length - i] = msgCorrected[i];
         }
+        */
         return msgCorrected;
     }
 }
