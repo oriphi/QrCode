@@ -46,6 +46,7 @@ public class GfArithmetic {
             return 0;
         return this.gfExp[this.gfLog[x] + this.gfLog[y]];
     }
+
     public int gfDiv(int x, int y) throws ArithmeticException
     {
         // Fait la division de x par y et renvoie le reste
@@ -75,6 +76,16 @@ public class GfArithmetic {
     *
     */
 
+    public int polyEval(int[] p, int x)
+     {
+         // Evalue le polynôme en x (Schema de Horner)
+         int l = p.length - 1;
+         int res = p[l];
+         for(int i = l- 1; i >= 0; i --)
+             res = this.gfMul(res, x) ^ p[i];
+         return res;
+     }
+
      public int[] polyAdd(int[] p, int[] q)
      {
          // Routine d'addition de deux polynomes
@@ -83,25 +94,15 @@ public class GfArithmetic {
          int i;
 
          for(i = 0; i < p.length; i++)
-             res[l - p.length + i] ^= p[i];
+             res[i] ^= p[i];
 
          for(i = 0; i < q.length; i++)
-             res[l - q.length + i] ^= q[i];
-
-         return res;
-     }
-
-     public int[] polyAddReverse(int[] p, int[] q)
-     {
-         int l = max(p.length,q.length);
-         int[] res = new int[l];
-         int i;
-         for(i = 0;i < p.length; i++)
-             res[i] = p[i];
-         for(i = 0;i < q.length; i++)
              res[i] ^= q[i];
-         return res;
+
+         return stripPoly(res);
      }
+
+
      public int[] polyScal(int[] p, int alpha)
      {
          // Routine de multiplication d'un poly par un scalaire (qui utilise une LUT)
@@ -114,44 +115,9 @@ public class GfArithmetic {
      }
 
 
-     public int[] polyDiv(int[] p, int[] q)
-     {
-         int a =this.gfInv(q[0]);
-         int[] p1;
-         int[] q1;
-         int[] d;
-         int[] m;
-         int i;
-         int j;
-
-         p1 = this.polyScal(p,a);
-         q1 = this.polyScal(q,a);
-
-
-         while(p1.length >= q1.length)
-         {
-            i = p1.length - q1.length;
-            m = new int[i + 1];
-            for(j = 0; j < m.length;j++)
-                m[j] = 0;
-            m[0] = 1;
-            d = this.polyScal(q1,p1[0]);
-            d = this.polyMul(d,m);
-            p1 = this.polyAdd(d,p1);
-            p1 = this.stripPoly(p1);
-            if (p1.length  == 0)
-            {
-                return new int[]{0};
-            }
-         }
-         return p1;
-     }
-
-
-
      public int[] polyMul(int[] p, int[] q)
      {
-         // Multiplication de 2 polynomes
+         // Multiplication de 2 polynômes
          int i, j;
          int[] res;
          if(p.length == 1)
@@ -169,30 +135,60 @@ public class GfArithmetic {
          return res;
      }
 
-     public int polyEval(int[] p, int x)
-     {
-         // Evalue le polynoome en x (Schema de Horner)
-         int res = p[0];
-         for(int i = 1; i < p.length; i ++)
-             res = this.gfMul(res, x) ^ p[i];
-         return res;
 
+     public int[] polyDiv(int[] p, int[] q)
+     {
+         int l = q.length - 1;
+         int a =this.gfInv(q[l]);
+         int[] p1;
+         int[] q1;
+         int[] d;
+         int[] m;
+         int i;
+         int j;
+
+         p1 = this.polyScal(p,a);
+         q1 = this.polyScal(q,a);
+
+         int [] reste = this.stripPoly(p1);
+
+         l = reste.length;
+         while(l >= q1.length)
+         {
+            i = l - q1.length;
+            m = new int[i + 1];
+            for(j = 0; j < m.length;j++)
+                m[j] = 0;
+            m[i] = 1;
+            d = this.polyScal(q1,reste[l - 1]);
+            d = this.polyMul(d,m);
+            reste = this.polyAdd(d,reste);
+             l = reste.length;
+            if (l  == 0)
+            {
+                return new int[]{0};
+            }
+         }
+         return reste;
      }
+
+
+
+
 
 
      public int[] polyDeriv(int[] p)
      {
-         // Dérive le polynome p
+         // Dérive le polynôme p
          int[] res = new int[p.length - 1];
-         for(int i = 0; i < p.length; i++)
+         for(int i = 1; i < p.length; i++)
          {
-             if(i % 2 == 1)
-                 res[p.length - 1 - i] = p[p.length - 1  - i];
+             if(i % 2 == 0)
+                 res[i - 2] = p[i - 1];
 
          }
          return this.stripPoly(res);
      }
-
 
     /*
     *
@@ -205,15 +201,14 @@ public class GfArithmetic {
 
     public int[] stripPoly(int[] p )
     {
-        // Enlève les zeros au début d'un polynome
+        // Enlève les zeros en fin de polynome
         int[] res;
-        int i = 0;
+        int i = p.length -1;
         int j;
-        System.out.println("[GfArithmetic]" + Arrays.toString(p));
-        while(p[i] == 0)i++;
-        res = new int[p.length - i];
+        while(p[i] == 0)i--;
+        res = new int[i + 1];
         for(j = 0; j < res.length;j++)
-            res[j] = p[i + j];
+            res[j] = p[j];
         return res;
 
     }
@@ -273,10 +268,8 @@ public class GfArithmetic {
     }
     public int[] polyShift(int[] p) throws ArithmeticException
     {
-        int[] res = new int[p.length];
-        if (p[p.length - 1] != 0)
-            throw new ArithmeticException("Overflow");
-        for(int i = 0; i < p.length - 1; i++)
+        int[] res = new int[p.length + 1];
+        for(int i = 0; i < p.length; i++)
         {
             res[i + 1] = p[i];
         }
@@ -293,7 +286,18 @@ public class GfArithmetic {
         return res;
     }
 
-    public int[] polyGenerator(int N)
+    public int[] createErasurePoly(int[] deg)
+    {
+        int[] res = new int[]{1};
+        int[] monome;
+        for(int i = 0 ; i < deg.length; i++)
+        {
+            monome = new int[]{1, gfPow(2,deg[i])};
+            res = polyMul(res, monome);
+        }
+        return res;
+    }
+    public int[] createGenPoly(int N)
     {
         int[] res = new int[]{1};
         int[] monome;
@@ -303,5 +307,12 @@ public class GfArithmetic {
             res = polyMul(res, monome);
         }
         return res;
+    }
+
+
+    // A Supprimer !!!!
+    public int[] polyAddReverse(int[] p, int [] q)
+    {
+        return p;
     }
 }

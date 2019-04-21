@@ -7,19 +7,21 @@ import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main);
-  }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }
 
 
-  public void onClick(View view)
-  {
-    Intent intent = new Intent(this,CameraPreview.class);
-    startActivity(intent);
-  }
+    public void onClick(View view)
+    {
+        Intent intent = new Intent(this,CameraPreview.class);
+        startActivity(intent);
+    }
 
-
-
+    public void launchAlert(View view){
+        AlertDialog alert = new AlertDialog();
+        alert.show(getSupportFragmentManager(),"Alert Dialog");
+    }
 }
