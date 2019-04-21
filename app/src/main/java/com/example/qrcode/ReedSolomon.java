@@ -168,8 +168,9 @@ public class ReedSolomon {
             System.out.println("FS: " + Arrays.toString(forneySyndroms));
             Lambda = bM(forneySyndroms);
             System.out.println("Lambda [BM]: " + Arrays.toString(Lambda));
-            if (Lambda == null)
+            if (Lambda == null) {
                 Lambda = Gamma;
+            }
             else
                 Lambda = this.gf.polyMul(Lambda, Gamma);
         }
@@ -177,7 +178,6 @@ public class ReedSolomon {
         LambdaReverse = new int[Lambda.length];
         for (i = 0; i < Lambda.length; i++)
             LambdaReverse[i] = Lambda[Lambda.length - 1 - i];
-
         LambdaPrime = this.gf.polyDeriv(Lambda);
 
         int[] racines = new int[Lambda.length - 1];
@@ -218,6 +218,7 @@ public class ReedSolomon {
         }
         System.out.println("msgCorr: " + Arrays.toString(msgCorrected));
         int[] syndtest = evalueSyndromes(msgCorrected, N);
+        System.out.println("SyndTest: " + Arrays.toString(syndtest));
         for (i = 0; i < syndtest.length; i++) {
             if (syndtest[i] != 0) {
                 throw new ArithmeticException("Trop d'erreurs, j'ai pas pu corriger");
