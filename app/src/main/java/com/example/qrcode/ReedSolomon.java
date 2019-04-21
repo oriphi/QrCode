@@ -218,12 +218,9 @@ public class ReedSolomon {
         }
         System.out.println("msgCorr: " + Arrays.toString(msgCorrected));
         int[] syndtest = evalueSyndromes(msgCorrected, N);
-        flag = true;
         for (i = 0; i < syndtest.length; i++) {
             if (syndtest[i] != 0) {
-                //throw new ArithmeticException("Trop d'erreurs, j'ai pas pu corriger");
-                flag = false;
-                break;
+                throw new ArithmeticException("Trop d'erreurs, j'ai pas pu corriger");
             }
         }
         if(!flag)
