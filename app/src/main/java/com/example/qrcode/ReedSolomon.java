@@ -226,6 +226,6 @@ public class ReedSolomon {
         for (i = 0; i < pmsg.length; i++) {
             pmsg[pmsg.length - 1 - i] = msgCorrected[i];
         }
-        return msgCorrected;
+        return pmsg;
     }
 }
