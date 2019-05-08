@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 public class PhotoColorPicker extends AppCompatActivity {
     private ImageView imageView;
-    Bitmap photo;
+    public static Bitmap photo;
     private int color;
 
 
@@ -33,7 +33,7 @@ public class PhotoColorPicker extends AppCompatActivity {
                 return false;
             }
         });
-        getImage();
+        //getImage();
         if(photo == null)
         {
            Log.d("[ColorPicker]", "Bitmap Not Found !!!") ;
@@ -43,10 +43,10 @@ public class PhotoColorPicker extends AppCompatActivity {
 
     }
 
-    private void getImage()
+    /*private void getImage()
     {
         photo = CameraPreview.getFinalImage();
-    }
+    }*/
 
     public void setColor(int c)
     {

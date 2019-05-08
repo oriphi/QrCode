@@ -18,12 +18,20 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.hardware.camera2.*;
+import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 
+import com.example.qrcode.imageProcessing.QrDetector;
+
 import java.util.Collections;
+
+import org.opencv.android.Utils;
+import org.opencv.core.Mat;
+import org.opencv.core.CvType;
+import org.opencv.imgproc.Imgproc;
 
 public class CameraPreview extends AppCompatActivity {
     int CAMERA_REQUEST_CODE = 100; // Code spécifique à chaque application (la valeur n'importe peu)
@@ -120,7 +128,9 @@ public class CameraPreview extends AppCompatActivity {
                 // pour l'instant, on récupère le bitmap sur l'objet textureView, puis on lance une nouvelle activité pipette qui affiche la
                 // couleur du pixel sur lequel on appuie
                 Bitmap image = textureView.getBitmap();
+
                 finalImage = image.createScaledBitmap(image, 600,800, false);
+
                 launchColorPicker();
                 /*
                 int width = image.getWidth();
@@ -145,6 +155,7 @@ public class CameraPreview extends AppCompatActivity {
     }
 
     private void launchColorPicker() {
+        PhotoColorPicker.photo = finalImage;
         Intent photo = new Intent(this, PhotoColorPicker.class);
         startActivity(photo);
     }
