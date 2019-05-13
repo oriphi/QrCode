@@ -11,25 +11,46 @@ import org.opencv.imgproc.Imgproc;
 public class QrDetector {
 
 
-    private final static int IMAGE_WIDTH = 600, IMAGE_HEIGHT = 800;
+    public final static int IMAGE_WIDTH = 600, IMAGE_HEIGHT = 800;
+
+    private Bitmap imageBitmap;
+    private Bitmap debugBitmap;
+
+    public QrDetector(Bitmap imageBitmap) {
+
+        this.imageBitmap = imageBitmap.createScaledBitmap(imageBitmap, IMAGE_WIDTH, IMAGE_HEIGHT, false);
+        this.debugBitmap = Bitmap.createBitmap(IMAGE_WIDTH, IMAGE_HEIGHT, Bitmap.Config.ARGB_8888);
+
+        analyze();
+
+    }
 
 
-    public static Bitmap analyze(Bitmap imageBitmap) {
+    public void analyze() {
 
-        imageBitmap = imageBitmap.createScaledBitmap(imageBitmap, IMAGE_WIDTH, IMAGE_HEIGHT, false);
+        long t = System.nanoTime();
 
-        Mat image = ImageFilter.bitmapToMat(imageBitmap, IMAGE_WIDTH, IMAGE_HEIGHT);
+        ImageFilter filter = new ImageFilter(imageBitmap);
+        byte[] array = filter.getArrayFiltered();
 
-        Mat image_high = ImageFilter.filter(image, IMAGE_WIDTH, IMAGE_HEIGHT);
+        // DEBUG
+        Utils.matToBitmap(filter.getMatFiltered(), debugBitmap);
 
-        //Log.d("IMPOROOROTTANTNNTNTNT", image_high.rows() + " ; " + image_high.cols() + " ; " + image_high.width() + " ; " + image_high.height());
+        PatternFinder finder = new PatternFinder(array);
 
+        for(int j = 0; j < array.length; j++) {
+            array[j] += 128;
+        }
 
-        Bitmap b = Bitmap.createBitmap(IMAGE_WIDTH, IMAGE_HEIGHT, Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(image_high, b);
+        Mat debugMat = new Mat (QrDetector.IMAGE_HEIGHT, QrDetector.IMAGE_WIDTH, CvType.CV_8UC1);
+        debugMat.put(0, 0, array);
+        Utils.matToBitmap(debugMat, debugBitmap);
 
-        return b;
+        Log.d("TEMPS EXECUTION TOTAL", String.valueOf((System.nanoTime()-t) / 1000000));
+    }
 
+    public Bitmap getDebugBitmap() {
+        return debugBitmap;
     }
 
 

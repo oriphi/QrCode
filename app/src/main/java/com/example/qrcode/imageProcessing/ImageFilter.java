@@ -11,41 +11,53 @@ import org.opencv.imgproc.Imgproc;
 
 public class ImageFilter {
 
-    public static double FILTRE_RATIO_IMAGE = 0.27;
+    public static double FILTRE_RATIO_IMAGE = 0.25;//0.27;
 
+    private Bitmap bitmap;
+    private Mat mat;
+    private byte[] arrayFiltered;
+    private Mat matFiltered;
 
-    public static Mat bitmapToMat(Bitmap bitmap, int width, int height) {
+    public ImageFilter(Bitmap bitmap) {
 
-        Mat image = new Mat (width, height, CvType.CV_8UC1);
-        Utils.bitmapToMat(bitmap, image);
-        Imgproc.cvtColor(image, image, Imgproc.COLOR_RGB2GRAY);
+        this.bitmap = bitmap;
 
-        return image;
+        bitmapToMat();
+        matToArrayFilter();
 
     }
 
 
-    public static Mat filter(Mat image, int width, int height) {
+    public void bitmapToMat() {
 
-        int tailleFiltre = (int)(Math.min(width, height) * FILTRE_RATIO_IMAGE);
+        mat = new Mat (QrDetector.IMAGE_HEIGHT, QrDetector.IMAGE_WIDTH, CvType.CV_8UC1);
+        Utils.bitmapToMat(bitmap, mat);
+        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_RGB2GRAY);
+
+    }
+
+
+    public void matToArrayFilter() {
+
+        int tailleFiltre = (int)(Math.min(QrDetector.IMAGE_WIDTH, QrDetector.IMAGE_HEIGHT) * FILTRE_RATIO_IMAGE);
         tailleFiltre -= 1 - tailleFiltre % 2;
 
-        Mat blur = new Mat (height, width, CvType.CV_8UC1);
-        Mat result = new Mat (height, width, CvType.CV_8UC1);
+        Mat blur = new Mat (QrDetector.IMAGE_HEIGHT, QrDetector.IMAGE_WIDTH, CvType.CV_8UC1);
+        matFiltered = new Mat (QrDetector.IMAGE_HEIGHT, QrDetector.IMAGE_WIDTH, CvType.CV_8UC1);
 
-        Imgproc.blur(image, blur, new org.opencv.core.Size(tailleFiltre, tailleFiltre));
+        Imgproc.blur(mat, blur, new org.opencv.core.Size(tailleFiltre, tailleFiltre));
 
 
-        byte[] buff1 = new byte[width * height];
-        byte[] buff2 = new byte[width * height];
-        byte[] buff3 = new byte[width * height];
+        byte[] buff1 = new byte[QrDetector.IMAGE_HEIGHT * QrDetector.IMAGE_WIDTH];
+        byte[] buff2 = new byte[QrDetector.IMAGE_HEIGHT * QrDetector.IMAGE_WIDTH];
+        arrayFiltered = new byte[QrDetector.IMAGE_HEIGHT * QrDetector.IMAGE_WIDTH];
 
-        image.get(0, 0, buff1);
+        mat.get(0, 0, buff1);
         blur.get(0, 0, buff2);
 
         int x;
 
-        for(int i = 0; i < width * height; i++) {
+        for(int i = 0; i < QrDetector.IMAGE_HEIGHT * QrDetector.IMAGE_WIDTH; i++) {
 
             if(buff1[i] < 0) {
                 x = buff1[i] + 256;
@@ -58,14 +70,12 @@ public class ImageFilter {
                 x -= buff2[i];
             }
 
-            //x += 128;
-
             if(x < -128) {
-                buff3[i] = -128;
+                arrayFiltered[i] = -128;
             } else if(x > 127) {
-                buff3[i] = 127;
+                arrayFiltered[i] = 127;
             } else {
-                buff3[i] = (byte)x;
+                arrayFiltered[i] = (byte)x;
             }
 
             //buff3[i] += 128;
@@ -73,19 +83,20 @@ public class ImageFilter {
 
         }
 
-        //image.put(0, 0, buff1);
-        result.put(0, 0, buff3);
+        matFiltered.put(0, 0, arrayFiltered);
 
-        Core.MinMaxLocResult minMaxLoc = Core.minMaxLoc(blur);
-        Log.d("MIN MAX", minMaxLoc.minVal + " ; " + minMaxLoc.maxVal);
+    }
 
+    public Mat getMat() {
+        return mat;
+    }
 
-        minMaxLoc = Core.minMaxLoc(result);
-        Log.d("MIN MAX", minMaxLoc.minVal + " ; " + minMaxLoc.maxVal);
+    public byte[] getArrayFiltered(){
+        return arrayFiltered;
+    }
 
-
-        return result;
-
+    public Mat getMatFiltered() {
+        return matFiltered;
     }
 
 
