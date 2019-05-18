@@ -37,9 +37,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void detect(View view) {
 
-        Drawable d = ContextCompat.getDrawable(this, R.drawable.picture2);
+        Drawable d = ContextCompat.getDrawable(this, R.drawable._9);
         Bitmap bitmap = ((BitmapDrawable)d).getBitmap();
 
+        QrDetector.IMAGE_WIDTH = bitmap.getWidth();
+        QrDetector.IMAGE_HEIGHT = bitmap.getHeight();
         QrDetector detector = new QrDetector(bitmap);
 
         PhotoColorPicker.photo = detector.getDebugBitmap();

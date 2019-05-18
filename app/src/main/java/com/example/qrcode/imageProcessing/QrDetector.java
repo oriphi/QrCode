@@ -11,7 +11,7 @@ import org.opencv.imgproc.Imgproc;
 public class QrDetector {
 
 
-    public final static int IMAGE_WIDTH = 600, IMAGE_HEIGHT = 800;
+    public static int IMAGE_WIDTH = 600, IMAGE_HEIGHT = 800;
 
     private Bitmap imageBitmap;
     private Bitmap debugBitmap;
@@ -38,12 +38,16 @@ public class QrDetector {
 
         PatternFinder finder = new PatternFinder(array);
 
+        Transform transform = new Transform(array, filter.getMatFiltered(), finder.getBg(), finder.getHg(), finder.getHd());
+
         for(int j = 0; j < array.length; j++) {
             array[j] += 128;
         }
 
         Mat debugMat = new Mat (QrDetector.IMAGE_HEIGHT, QrDetector.IMAGE_WIDTH, CvType.CV_8UC1);
         debugMat.put(0, 0, array);
+
+        debugMat = transform.getMatTf();
         Utils.matToBitmap(debugMat, debugBitmap);
 
         Log.d("TEMPS EXECUTION TOTAL", String.valueOf((System.nanoTime()-t) / 1000000));

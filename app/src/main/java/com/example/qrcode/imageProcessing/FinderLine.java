@@ -1,9 +1,10 @@
 package com.example.qrcode.imageProcessing;
 
+import java.util.ArrayList;
+
 public class FinderLine {
 
-    private int x1, x2, x3, x4;
-    private int y1, y2, y3, y4;
+    private int j1, j2, j3, j4;
 
     private double score;
 
@@ -11,19 +12,22 @@ public class FinderLine {
     private int k;
     private int[] kMin, kMax;
 
-    public FinderLine(int[] x, int[] y, int direction, int k, int iMin, int iMax) {
+    private int iMin, iMax;
 
-        this.x1 = x[0];
-        this.x2 = x[2];
-        this.x3 = x[3];
-        this.x4 = x[5];
-        this.y1 = y[0];
-        this.y2 = y[2];
-        this.y3 = y[3];
-        this.y4 = y[5];
+
+    public FinderLine(int j1, int j2, int j3, int j4, int direction, int k, int iMin, int iMax, double score) {
+
+        this.j1 = j1;
+        this.j2 = j2;
+        this.j3 = j3;
+        this.j4 = j4;
+
+        this.score = score;
 
         this.direction = direction;
         this.k = k;
+        this.iMin = iMin;
+        this.iMax = iMax;
 
         kMin = new int[4];
         kMax = new int[4];
@@ -93,6 +97,10 @@ public class FinderLine {
 
     }
 
+    public double getScore() {
+        return score;
+    }
+
     public int getDirection() {
         return direction;
     }
@@ -109,6 +117,26 @@ public class FinderLine {
         return kMax;
     }
 
+    public int getJ1() {
+        return j1;
+    }
+    public int getJ2() {
+        return j2;
+    }
+    public int getJ3() {
+        return j3;
+    }
+    public int getJ4() {
+        return j4;
+    }
+
+    public int getIMin() {
+        return iMin;
+    }
+    public int getIMax() {
+        return iMax;
+    }
+
     public static boolean intersect(FinderLine l1, FinderLine l2) {
 
         int k1Min = l1.getKMin()[l2.getDirection()];
@@ -118,6 +146,26 @@ public class FinderLine {
         int k2Max = l2.getKMax()[l1.getDirection()];
 
         return l2.getK() >= k1Min && l2.getK() < k1Max && l1.getK() >= k2Min && l1.getK() < k2Max;
+    }
+
+    public static double score(ArrayList<Integer> borders, int n) {
+
+        int sum = borders.get(n + 5) - borders.get(n);
+        double score = 1;
+
+        double v1, v2;
+        for(int i = 0; i < 5; i++) {
+            v1 = (borders.get(n + i + 1) - borders.get(n + i)) * 1.0 / sum;
+            v2 = (i==2)? 3.0/7 : 1.0/7;
+
+            if(v1 > v2) {
+                score *= v2 / v1;
+            } else {
+                score *= v1 / v2;
+            }
+        }
+
+        return score;
     }
 
 }

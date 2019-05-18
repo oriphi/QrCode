@@ -1,9 +1,8 @@
 package com.example.qrcode.imageProcessing;
 
 
-import org.opencv.core.Mat;
+import android.util.Log;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class PatternFinder {
@@ -15,6 +14,7 @@ public class PatternFinder {
     private byte[] array;
 
     private ArrayList<FinderGroup> finderGroups;
+    private int bg, hg, hd;
 
 
     public PatternFinder(byte[] array) {
@@ -80,6 +80,20 @@ public class PatternFinder {
         }
 
         for(int k = 0; k < kMax; k++) {
+
+            if(direction > 0) {
+                boolean possible = false;
+                for(int g = 0; g < finderGroups.size() && !possible; g++) {
+                    if(k >= finderGroups.get(g).getKMin()[direction] && k < finderGroups.get(g).getKMax()[direction]) {
+                        possible = true;
+                    }
+                }
+                if(!possible) {
+                    continue;
+                }
+
+            }
+
 
             int[] lineArrayIndices = lineArrayIndices(direction, k);
             int j = lineArrayIndices[0];
@@ -165,56 +179,195 @@ public class PatternFinder {
             //double[] intensities = new double[]{-1, -1, -1, -1, -1};
 
             for(int n = 0; n < borders.size()-5; n+=2) {
-                /*
-                for(int i = 0; i < 3; i++) {
-                    intensities[i] = intensities[i+2];
-                }
-                intensities[3] = -1;
-                intensities[4] = -1;
-                */
-                int sum = borders.get(n + 5) - borders.get(n);
-                double score = 1;
 
-                double v1, v2;
-                for(int i = 0; i < 5; i++) {
-                    v1 = (borders.get(n + i + 1) - borders.get(n + i)) * 1.0 / sum;
-                    v2 = (i==2)? 3.0/7 : 1.0/7;
-
-                    if(v1 > v2) {
-                        score *= v2 / v1;
-                    } else {
-                        score *= v1 / v2;
-                    }
-                }
+                double score = FinderLine.score(borders, n);
 
                 if(score < SCORE_MIN_1)
                     continue;
 
 
-                //TODO: rajouter le calcul d'intensité
+                FinderLine line = new FinderLine(borders.get(n), borders.get(n+2), borders.get(n+3), borders.get(n+5), direction, k, (borders.get(n+2) - lineArrayIndices[0]) / lineArrayIndices[1],
+                        (borders.get(n+3) - lineArrayIndices[0]) / lineArrayIndices[1], score);
 
-                for(int j2 = borders.get(n+2); j2 < borders.get(n+3); j2 += lineArrayIndices[1]) {
 
-                    array[j2] = -128;
+                if(direction > 0) {
 
+                    ArrayList<Integer> intersections = new ArrayList<Integer>();
+                    for(int g = 0; g < finderGroups.size(); g++) {
+                        if(finderGroups.get(g).intersect(line)) {
+                            intersections.add(g);
+                        }
+                    }
+
+                    if(intersections.size() > 0) {
+                        for(int g = intersections.size()-1; g > 0; g--) {
+                            FinderGroup group = finderGroups.remove((int)intersections.get(g));
+                            finderGroups.get(intersections.get(0)).merge(group);
+                        }
+                        finderGroups.get(intersections.get(0)).addFinderLine(line);
+                    } else {
+                        finderGroups.add(new FinderGroup(line));
+                    }
+
+                } else {
+                    finderGroups.add(new FinderGroup(line));
                 }
 
             }
 
         }
 
-
-
     }
 
-    private void checkAllLines() {
+    public void findRightAngle() {
 
+        for(FinderGroup group : finderGroups) {
+            group.findBorders();
+            group.calculateScore();
+        }
+
+        double score;
+        double scoreBest = 0;
+
+        for(int hg = 0; hg < finderGroups.size(); hg++) {
+
+            score = finderGroups.get(hg).getScore();
+            if(score <= scoreBest) {
+                continue;
+            }
+
+            for(int bg = 1; bg < finderGroups.size(); bg++) {
+
+                if(bg == hg)
+                    continue;
+
+                score = finderGroups.get(hg).getScore() * finderGroups.get(bg).getScore();
+                if(score <= scoreBest) {
+                    continue;
+                }
+
+                for(int hd = 0; hd < bg; hd++) {
+
+                    if(hd == hg)
+                        continue;
+
+                    score = finderGroups.get(hg).getScore() * finderGroups.get(bg).getScore() * finderGroups.get(hd).getScore();
+                    if(score <= scoreBest) {
+                        continue;
+                    }
+
+                    double angle = MathUtil.angle(
+                            finderGroups.get(hg).getCenter(),
+                            finderGroups.get(hd).getCenter(),
+                            finderGroups.get(bg).getCenter()
+                    );
+
+                    score *= Math.sin(angle);
+
+                    Log.d("SCORE", bg + "/" + hg + "/" + hd + " : " + score + " / " + scoreBest );
+                    Log.d("SCORE", finderGroups.get(bg).getCenter() + " / " + finderGroups.get(hg).getCenter() + " / " + finderGroups.get(hd).getCenter() + " : " + angle);
+
+
+                    if(score > scoreBest) {
+                        this.bg = bg;
+                        this.hg = hg;
+                        this.hd = hd;
+                        scoreBest = score;
+                    } else if(-score > scoreBest) {
+                        this.bg = hd;
+                        this.hg = hg;
+                        this.hd = bg;
+                        scoreBest = -score;
+                    }
+
+                }
+
+            }
+
+        }
     }
 
     public void analyze() {
 
+        checkLines(0);
+
+        Log.d("NOMBRE DE GROUPES", String.valueOf(finderGroups.size()));
+
+        checkLines(1);
+
+        Log.d("NOMBRE DE GROUPES", String.valueOf(finderGroups.size()));
+
+        checkLines(2);
+
+        Log.d("NOMBRE DE GROUPES", String.valueOf(finderGroups.size()));
+
         checkLines(3);
 
+        Log.d("NOMBRE DE GROUPES", String.valueOf(finderGroups.size()));
+
+        for(int g = finderGroups.size()-1; g >= 0; g--) {
+            int miss = 0;
+            for(int direction = 0; direction < 4; direction++) {
+                if(finderGroups.get(g).getLines(direction).size() == 0) {
+                    miss++;
+                }
+            }
+            if(miss > 1) {
+                finderGroups.remove(g);
+            }
+
+        }
+
+        Log.d("NOMBRE DE GROUPES", String.valueOf(finderGroups.size()));
+/*
+        for(int i = 0; i < array.length; i++) {
+            array[i] = -128;
+        }
+*/
+
+        findRightAngle();
+/*
+        for(int j = 0; j < array.length; j++) {
+            array[j] = -128;
+        }
+*/
+        for(int direction = 0; direction < 4; direction++) {
+            int increment = lineArrayIndices(direction, 0)[1];
+            for(FinderLine line : finderGroups.get(bg).getLines(direction)) {
+                for(int j = line.getJ2(); j < line.getJ3(); j += increment) {
+                    array[j] = 127;
+                }
+            }
+            for(FinderLine line : finderGroups.get(hg).getLines(direction)) {
+                for(int j = line.getJ2(); j < line.getJ3(); j += increment) {
+                    array[j] = 127;
+                }
+            }
+            for(FinderLine line : finderGroups.get(hd).getLines(direction)) {
+                for(int j = line.getJ2(); j < line.getJ3(); j += increment) {
+                    array[j] = 127;
+                }
+            }
+
+        }
+
+        Log.d("BG", bg + " : " + finderGroups.get(bg).getCenter().toString());
+        Log.d("HG", hg + " : " + finderGroups.get(hg).getCenter().toString());
+        Log.d("HD", hd + " : " + finderGroups.get(hd).getCenter().toString());
+
+
+    }
+
+    public FinderGroup getBg() {
+        return finderGroups.get(bg);
+    }
+
+    public FinderGroup getHg() {
+        return finderGroups.get(hg);
+    }
+
+    public FinderGroup getHd() {
+        return finderGroups.get(hd);
     }
 
 }

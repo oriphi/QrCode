@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.BitmapDrawable;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -131,6 +132,11 @@ public class CameraPreview extends AppCompatActivity {
 
                 finalImage = image.createScaledBitmap(image, 600,800, false);
 
+                QrDetector.IMAGE_WIDTH = finalImage.getWidth();
+                QrDetector.IMAGE_HEIGHT = finalImage.getHeight();
+                QrDetector detector = new QrDetector(finalImage);
+
+                finalImage = detector.getDebugBitmap();
                 launchColorPicker();
                 /*
                 int width = image.getWidth();
