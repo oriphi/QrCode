@@ -130,11 +130,11 @@ public class CameraPreview extends AppCompatActivity {
                 // couleur du pixel sur lequel on appuie
                 Bitmap image = textureView.getBitmap();
 
-                finalImage = image.createScaledBitmap(image, 600,800, false);
+                //finalImage = image.createScaledBitmap(image, 600,800, false);
 
-                QrDetector.IMAGE_WIDTH = finalImage.getWidth();
-                QrDetector.IMAGE_HEIGHT = finalImage.getHeight();
-                QrDetector detector = new QrDetector(finalImage);
+                QrDetector.IMAGE_WIDTH = image.getWidth();
+                QrDetector.IMAGE_HEIGHT = image.getHeight();
+                QrDetector detector = new QrDetector(image);
 
                 finalImage = detector.getDebugBitmap();
                 launchColorPicker();

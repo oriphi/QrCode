@@ -18,8 +18,9 @@ public class QrDetector {
 
     public QrDetector(Bitmap imageBitmap) {
 
-        this.imageBitmap = imageBitmap.createScaledBitmap(imageBitmap, IMAGE_WIDTH, IMAGE_HEIGHT, false);
-        this.debugBitmap = Bitmap.createBitmap(IMAGE_WIDTH, IMAGE_HEIGHT, Bitmap.Config.ARGB_8888);
+        this.imageBitmap = imageBitmap;
+        IMAGE_WIDTH = imageBitmap.getWidth();
+        IMAGE_HEIGHT = imageBitmap.getHeight();
 
         analyze();
 
@@ -32,23 +33,14 @@ public class QrDetector {
 
         ImageFilter filter = new ImageFilter(imageBitmap);
         byte[] array = filter.getArrayFiltered();
+        byte[] arrayDebug = filter.getArrayDebug();
 
-        // DEBUG
-        Utils.matToBitmap(filter.getMatFiltered(), debugBitmap);
+        PatternFinder finder = new PatternFinder(array, arrayDebug);
+        Transform transform = new Transform(filter.getMatFiltered(), finder.getBg(), finder.getHg(), finder.getHd(), arrayDebug);
 
-        PatternFinder finder = new PatternFinder(array);
-
-        Transform transform = new Transform(array, filter.getMatFiltered(), finder.getBg(), finder.getHg(), finder.getHd());
-
-        for(int j = 0; j < array.length; j++) {
-            array[j] += 128;
-        }
-
-        Mat debugMat = new Mat (QrDetector.IMAGE_HEIGHT, QrDetector.IMAGE_WIDTH, CvType.CV_8UC1);
-        debugMat.put(0, 0, array);
-
-        debugMat = transform.getMatTf();
-        Utils.matToBitmap(debugMat, debugBitmap);
+        //filter.debug();
+        filter.debug(transform.getMatTransform());
+        debugBitmap = filter.getBitmapDebug();
 
         Log.d("TEMPS EXECUTION TOTAL", String.valueOf((System.nanoTime()-t) / 1000000));
     }

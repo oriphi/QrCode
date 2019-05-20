@@ -7,19 +7,21 @@ import java.util.ArrayList;
 
 public class PatternFinder {
 
-    public static int THRESHOLD_1 = -20, THRESHOLD_2 = 12;
+    public static int THRESHOLD_1 = -20, THRESHOLD_2 = 10;
     public static double SCORE_MIN_1 = 0.32;
 
 
     private byte[] array;
+    private byte[] arrayDebug;
 
     private ArrayList<FinderGroup> finderGroups;
     private int bg, hg, hd;
 
 
-    public PatternFinder(byte[] array) {
+    public PatternFinder(byte[] array, byte[] arrayDebug) {
 
         this.array = array;
+        this.arrayDebug = arrayDebug;
 
         this.finderGroups = new ArrayList<FinderGroup> ();
 
@@ -125,9 +127,13 @@ public class PatternFinder {
                 }
 /*
                 if(newState == 0) {
-                    array[j] = -128;
+                    debugArray[3*j] = 127;
+                    debugArray[3*j+1] = -128;
+                    debugArray[3*j+2] = -128;
                 } else if(newState == 1) {
-                    array[j] = 127;
+                    debugArray[3*j] = -128;
+                    debugArray[3*j+1] = 127;
+                    debugArray[3*j+2] = -128;
                 }
 */
                 if(state == 0) {
@@ -168,10 +174,12 @@ public class PatternFinder {
 /*
             for(int n = 0; n < borders.size()-1; n++) {
                 for(int j2 = borders.get(n); j2 < borders.get(n+1); j2 += lineArrayIndices[1]) {
-                    if(n%2 == 0) {
-                        array[j2] = -128;
-                    } else {
-                        array[j2] = 127;
+                    if(direction < 2) {
+                        if(n%2 == 0) {
+                            debugArray[3*j2 + direction] = -128;
+                        } else {
+                            debugArray[3*j2 + direction] = 127;
+                        }
                     }
                 }
             }
@@ -264,8 +272,8 @@ public class PatternFinder {
 
                     score *= Math.sin(angle);
 
-                    Log.d("SCORE", bg + "/" + hg + "/" + hd + " : " + score + " / " + scoreBest );
-                    Log.d("SCORE", finderGroups.get(bg).getCenter() + " / " + finderGroups.get(hg).getCenter() + " / " + finderGroups.get(hd).getCenter() + " : " + angle);
+                    //Log.d("SCORE", bg + "/" + hg + "/" + hd + " : " + score + " / " + scoreBest );
+                    //Log.d("SCORE", finderGroups.get(bg).getCenter() + " / " + finderGroups.get(hg).getCenter() + " / " + finderGroups.get(hd).getCenter() + " : " + angle);
 
 
                     if(score > scoreBest) {
@@ -291,19 +299,19 @@ public class PatternFinder {
 
         checkLines(0);
 
-        Log.d("NOMBRE DE GROUPES", String.valueOf(finderGroups.size()));
+        //Log.d("NOMBRE DE GROUPES", String.valueOf(finderGroups.size()));
 
         checkLines(1);
 
-        Log.d("NOMBRE DE GROUPES", String.valueOf(finderGroups.size()));
+        //Log.d("NOMBRE DE GROUPES", String.valueOf(finderGroups.size()));
 
         checkLines(2);
 
-        Log.d("NOMBRE DE GROUPES", String.valueOf(finderGroups.size()));
+        //Log.d("NOMBRE DE GROUPES", String.valueOf(finderGroups.size()));
 
         checkLines(3);
 
-        Log.d("NOMBRE DE GROUPES", String.valueOf(finderGroups.size()));
+        //Log.d("NOMBRE DE GROUPES", String.valueOf(finderGroups.size()));
 
         for(int g = finderGroups.size()-1; g >= 0; g--) {
             int miss = 0;
@@ -331,30 +339,44 @@ public class PatternFinder {
             array[j] = -128;
         }
 */
-        for(int direction = 0; direction < 4; direction++) {
-            int increment = lineArrayIndices(direction, 0)[1];
-            for(FinderLine line : finderGroups.get(bg).getLines(direction)) {
-                for(int j = line.getJ2(); j < line.getJ3(); j += increment) {
-                    array[j] = 127;
-                }
+
+        for(int g = 0; g < finderGroups.size(); g++) {
+            byte v1, v2, v3;
+            if(g == bg) {
+                v1 = (byte)255;
+                v2 = 0;
+                v3 = 0;
+            } else if(g == hg) {
+                v1 = 0;
+                v2 = (byte)255;
+                v3 = 0;
+            } else if(g == hd) {
+                v1 = 0;
+                v2 = 0;
+                v3 = (byte)255;
+            } else {
+                v1 = (byte)255;
+                v2 = (byte)255;
+                v3 = 0;
             }
-            for(FinderLine line : finderGroups.get(hg).getLines(direction)) {
-                for(int j = line.getJ2(); j < line.getJ3(); j += increment) {
-                    array[j] = 127;
+            for(int direction = 0; direction < 4; direction++) {
+                int increment = lineArrayIndices(direction, 0)[1];
+                for(FinderLine line : finderGroups.get(g).getLines(direction)) {
+                    for(int j = line.getJ2(); j < line.getJ3(); j += increment) {
+                        arrayDebug[3*j] = v1;
+                        arrayDebug[3*j+1] = v2;
+                        arrayDebug[3*j+2] = v3;
+                    }
                 }
-            }
-            for(FinderLine line : finderGroups.get(hd).getLines(direction)) {
-                for(int j = line.getJ2(); j < line.getJ3(); j += increment) {
-                    array[j] = 127;
-                }
+
             }
 
         }
-
+        /*
         Log.d("BG", bg + " : " + finderGroups.get(bg).getCenter().toString());
         Log.d("HG", hg + " : " + finderGroups.get(hg).getCenter().toString());
         Log.d("HD", hd + " : " + finderGroups.get(hd).getCenter().toString());
-
+        */
 
     }
 
