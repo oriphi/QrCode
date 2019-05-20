@@ -319,4 +319,7 @@ public class Transform {
         return matTransform;
     }
 
+    public int getSize() {
+        return size;
+    }
 }

@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import com.example.qrcode.imageProcessing.QrDetector;
@@ -47,6 +48,12 @@ public class MainActivity extends AppCompatActivity {
         Bitmap bitmap = ((BitmapDrawable)d).getBitmap();
 
         QrDetector detector = new QrDetector(bitmap);
+
+        int[][] code = detector.getCode();
+        // ICI ///////////////////////////
+        QrRead read = new QrRead(code);
+        Log.d("MESSAGE FINAL", read.getQrMessageDecode());
+        //////////////////////////////////
 
         PhotoColorPicker.photo = detector.getDebugBitmap();
         Intent photo = new Intent(this, PhotoColorPicker.class);

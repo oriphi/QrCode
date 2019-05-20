@@ -136,6 +136,14 @@ public class CameraPreview extends AppCompatActivity {
                 QrDetector.IMAGE_HEIGHT = image.getHeight();
                 QrDetector detector = new QrDetector(image);
 
+
+                int[][] code = detector.getCode();
+                // ICI ///////////////////////////
+                QrRead read = new QrRead(code);
+                Log.d("MESSAGE FINAL", read.getQrMessageDecode());
+                //////////////////////////////////
+
+
                 finalImage = detector.getDebugBitmap();
                 launchColorPicker();
                 /*

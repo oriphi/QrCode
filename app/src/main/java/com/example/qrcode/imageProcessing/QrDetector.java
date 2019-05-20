@@ -16,6 +16,9 @@ public class QrDetector {
     private Bitmap imageBitmap;
     private Bitmap debugBitmap;
 
+    private int status;
+    private int[][] code;
+
     public QrDetector(Bitmap imageBitmap) {
 
         this.imageBitmap = imageBitmap;
@@ -38,8 +41,11 @@ public class QrDetector {
         PatternFinder finder = new PatternFinder(array, arrayDebug);
         Transform transform = new Transform(filter.getMatFiltered(), finder.getBg(), finder.getHg(), finder.getHd(), arrayDebug);
 
+        ImageReader reader = new ImageReader(transform.getMatTransform(), transform.getSize());
+        code = reader.getCode();
+
         //filter.debug();
-        filter.debug(transform.getMatTransform());
+        filter.debug(reader.getMatTransform());
         debugBitmap = filter.getBitmapDebug();
 
         Log.d("TEMPS EXECUTION TOTAL", String.valueOf((System.nanoTime()-t) / 1000000));
@@ -47,6 +53,10 @@ public class QrDetector {
 
     public Bitmap getDebugBitmap() {
         return debugBitmap;
+    }
+
+    public int[][] getCode() {
+        return code;
     }
 
 
