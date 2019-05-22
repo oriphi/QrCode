@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void launchAlert(View view){
-        AlertDialog alert = new AlertDialog();
+        AlertDialog alert = new AlertDialog("SALUT COMMENT CA VA");
         alert.show(getSupportFragmentManager(),"Alert Dialog");
     }
 
@@ -44,20 +44,31 @@ public class MainActivity extends AppCompatActivity {
 
         //ids = new int[]{R.drawable.test, R.drawable.test2};
 
-        Drawable d = ContextCompat.getDrawable(this, ids[(int)(Math.random()*ids.length)]);
+        int rand = (int)(Math.random()*ids.length);
+
+        Log.d("IMAGE RANDOM", String.valueOf(rand+1));
+
+        Drawable d = ContextCompat.getDrawable(this, ids[rand]);
         Bitmap bitmap = ((BitmapDrawable)d).getBitmap();
 
+        // DETECTION ///////////////////////////
         QrDetector detector = new QrDetector(bitmap);
+        if(detector.getStatus() == -1) {
+            AlertDialog alert = new AlertDialog("!!!! ERREUR !!!!");
+            alert.show(getSupportFragmentManager(),"Alert Dialog");
+        } else {
+            int[][] code = detector.getCode();
+            QrFactory fact = new QrFactory();
+            QrRead read = fact.getQrType(code);
 
-        int[][] code = detector.getCode();
-        // ICI ///////////////////////////
-        QrRead read = new QrRead(code);
-        Log.d("MESSAGE FINAL", read.getQrMessageDecode());
-        //////////////////////////////////
+            PhotoColorPicker.photo = detector.getDebugBitmap();
+            Intent photo = new Intent(this, PhotoColorPicker.class);
+            startActivity(photo);
 
-        PhotoColorPicker.photo = detector.getDebugBitmap();
-        Intent photo = new Intent(this, PhotoColorPicker.class);
-        startActivity(photo);
+            AlertDialog alert = new AlertDialog(read.getQrMessageDecode());
+            alert.show(getSupportFragmentManager(),"Alert Dialog");
+        }
+
 
     }
 

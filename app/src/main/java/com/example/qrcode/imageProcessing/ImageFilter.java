@@ -15,6 +15,7 @@ public class ImageFilter {
 
     private Bitmap bitmapOrig;
     private Mat matOrig;
+    private Mat matOrigGray;
 
     private Mat matBlur;
 
@@ -28,9 +29,11 @@ public class ImageFilter {
     public ImageFilter(Bitmap bitmapOrig) {
 
         this.bitmapOrig = bitmapOrig;
-        this.matOrig = new Mat (QrDetector.IMAGE_HEIGHT, QrDetector.IMAGE_WIDTH, CvType.CV_8UC1);
+        this.matOrig = new Mat (QrDetector.IMAGE_HEIGHT, QrDetector.IMAGE_WIDTH, CvType.CV_8UC4);
         Utils.bitmapToMat(bitmapOrig, matOrig);
-        Imgproc.cvtColor(matOrig, matOrig, Imgproc.COLOR_RGB2GRAY);
+        //Log.d("TYPE MAT ORIG", matOrig.type()+" "+CvType.CV_8UC3+" "+CvType.CV_8UC4);
+        this.matOrigGray = new Mat (QrDetector.IMAGE_HEIGHT, QrDetector.IMAGE_WIDTH, CvType.CV_8UC1);
+        Imgproc.cvtColor(matOrig, matOrigGray, Imgproc.COLOR_RGB2GRAY);
 
         blur();
         filter();
@@ -42,7 +45,7 @@ public class ImageFilter {
         int tailleFiltre = (int)(Math.min(QrDetector.IMAGE_WIDTH, QrDetector.IMAGE_HEIGHT) * FILTRE_RATIO_IMAGE);
         tailleFiltre -= 1 - tailleFiltre % 2;
         matBlur = new Mat (QrDetector.IMAGE_HEIGHT, QrDetector.IMAGE_WIDTH, CvType.CV_8UC1);
-        Imgproc.GaussianBlur(matOrig, matBlur, new org.opencv.core.Size(tailleFiltre, tailleFiltre), 0.3*((tailleFiltre-1)*0.5 - 1) + 0.8);
+        Imgproc.GaussianBlur(matOrigGray, matBlur, new org.opencv.core.Size(tailleFiltre, tailleFiltre), 0.3*((tailleFiltre-1)*0.5 - 1) + 0.8);
 
     }
 
@@ -52,7 +55,7 @@ public class ImageFilter {
         byte[] buff2 = new byte[QrDetector.IMAGE_HEIGHT * QrDetector.IMAGE_WIDTH];
         arrayFiltered = new byte[QrDetector.IMAGE_HEIGHT * QrDetector.IMAGE_WIDTH];
 
-        matOrig.get(0, 0, buff1);
+        matOrigGray.get(0, 0, buff1);
         matBlur.get(0, 0, buff2);
 
         int x;
@@ -112,6 +115,30 @@ public class ImageFilter {
         bitmapDebug = Bitmap.createBitmap(matDebug.width(), matDebug.height(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(matDebug, bitmapDebug);
 
+    }
+
+    public Mat add(Mat m1, Mat m2) {
+        Mat result = new Mat(m1.rows(), m1.cols(), CvType.CV_8UC4);
+
+        byte[] buf1 = new byte[m1.rows()*m1.cols()*4];
+        byte[] buf2 = new byte[buf1.length];
+        m1.get(0,0, buf1);
+        m2.get(0,0, buf2);
+
+        for(int n = 0; n < buf1.length; n+=4) {
+            if(buf2[n+3] != 0) {
+                buf1[n] = buf2[n];
+                buf1[n+1] = buf2[n+1];
+                buf1[n+2] = buf2[n+2];
+            }
+        }
+        result.put(0, 0, buf1);
+
+        //Log.d("RESULT", result.width()+" "+result.height()+" "+result.type());
+        //Log.d("M1", m1.width()+" "+m1.height()+" "+m1.type());
+        //Log.d("M2", m2.width()+" "+m2.height()+" "+m2.type());
+
+        return result;
     }
 
     public Bitmap getBitmapOrig() {

@@ -13,9 +13,16 @@ import android.content.ClipboardManager;
 
 
 public class AlertDialog extends AppCompatDialogFragment {
+
+    private String text;
+
+    public AlertDialog(String text) {
+        super();
+        this.text = text;
+    }
+
     public Dialog onCreateDialog(Bundle savedInstanceState){
 
-        final String text = "Salut comment ça va";
         Builder builder;
         builder = new Builder(getActivity());
         // Remplacer les String par des chaînes R.string

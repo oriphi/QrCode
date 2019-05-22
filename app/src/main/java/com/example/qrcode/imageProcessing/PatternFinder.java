@@ -10,6 +10,7 @@ public class PatternFinder {
     public static int THRESHOLD_1 = -20, THRESHOLD_2 = 10;
     public static double SCORE_MIN_1 = 0.32;
 
+    private int status = 0;
 
     private byte[] array;
     private byte[] arrayDebug;
@@ -313,6 +314,7 @@ public class PatternFinder {
 
         //Log.d("NOMBRE DE GROUPES", String.valueOf(finderGroups.size()));
 
+
         for(int g = finderGroups.size()-1; g >= 0; g--) {
             int miss = 0;
             for(int direction = 0; direction < 4; direction++) {
@@ -326,7 +328,15 @@ public class PatternFinder {
 
         }
 
-        Log.d("NOMBRE DE GROUPES", String.valueOf(finderGroups.size()));
+        
+        if(finderGroups.size() > 2) {
+            status = 1;
+        } else {
+            status = -1;
+            return;
+        }
+
+        //Log.d("NOMBRE DE GROUPES", String.valueOf(finderGroups.size()));
 /*
         for(int i = 0; i < array.length; i++) {
             array[i] = -128;
@@ -390,6 +400,10 @@ public class PatternFinder {
 
     public FinderGroup getHd() {
         return finderGroups.get(hd);
+    }
+
+    public int getStatus() {
+        return status;
     }
 
 }

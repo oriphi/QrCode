@@ -45,7 +45,7 @@ public class CameraPreview extends AppCompatActivity {
     private CameraDevice.StateCallback stateCallback;       // Fonction de callback pour la création de caméra
 
 
-    static private Bitmap finalImage = null;    // Bitmap qui va contenir l'image que l'on va prendre
+    //static private Bitmap finalImage = null;    // Bitmap qui va contenir l'image que l'on va prendre
 
     private Size previewSize;                   // Taille des photos capturé par la caméra
     private String cameraId;                    // Identifiant unique de la caméra
@@ -128,24 +128,27 @@ public class CameraPreview extends AppCompatActivity {
             public void onClick(View v) {
                 // pour l'instant, on récupère le bitmap sur l'objet textureView, puis on lance une nouvelle activité pipette qui affiche la
                 // couleur du pixel sur lequel on appuie
-                Bitmap image = textureView.getBitmap();
 
                 //finalImage = image.createScaledBitmap(image, 600,800, false);
 
-                QrDetector.IMAGE_WIDTH = image.getWidth();
-                QrDetector.IMAGE_HEIGHT = image.getHeight();
-                QrDetector detector = new QrDetector(image);
+                QrDetector detector = new QrDetector(textureView.getBitmap());
+                if(detector.getStatus() == -1) {
+                    AlertDialog alert = new AlertDialog("!!!! ERREUR !!!!");
+                    alert.show(getSupportFragmentManager(),"Alert Dialog");
+                } else {
+                    int[][] code = detector.getCode();
+                    QrFactory fact = new QrFactory();
+                    QrRead read = fact.getQrType(code);
+
+                    PhotoColorPicker.photo = detector.getDebugBitmap();
+                    Intent photo = new Intent(CameraPreview.this, PhotoColorPicker.class);
+                    startActivity(photo);
+
+                    AlertDialog alert = new AlertDialog(read.getQrMessageDecode());
+                    alert.show(getSupportFragmentManager(),"Alert Dialog");
+                }
 
 
-                int[][] code = detector.getCode();
-                // ICI ///////////////////////////
-                QrRead read = new QrRead(code);
-                Log.d("MESSAGE FINAL", read.getQrMessageDecode());
-                //////////////////////////////////
-
-
-                finalImage = detector.getDebugBitmap();
-                launchColorPicker();
                 /*
                 int width = image.getWidth();
                 int height = image.getHeight();
@@ -162,7 +165,7 @@ public class CameraPreview extends AppCompatActivity {
         });
 
     }
-
+/*
     static public Bitmap getFinalImage()
     {
         return finalImage;
@@ -173,7 +176,7 @@ public class CameraPreview extends AppCompatActivity {
         Intent photo = new Intent(this, PhotoColorPicker.class);
         startActivity(photo);
     }
-
+*/
 
     private void setUpCamera()
             // Fonction utilisée pour configurer la caméra une fois que le preview est disponible

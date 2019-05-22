@@ -7,6 +7,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
@@ -16,6 +17,8 @@ import java.util.Comparator;
 public class Transform {
 
     public static int MODULE_SIZE = 9;
+
+    private int status = 0;
 
     private Mat mat;
 
@@ -182,8 +185,8 @@ public class Transform {
         int xMax = iMax % width;
         int yMax = iMax / width;
 
-        Log.d("LITTLE FINDER", xMax + " ; " + yMax);
-        Log.d("LITTLE FINDER", (xMax + xStart) + " ; " + (yMax + xStart));
+        //Log.d("LITTLE FINDER", xMax + " ; " + yMax);
+        //Log.d("LITTLE FINDER", (xMax + xStart) + " ; " + (yMax + xStart));
 
 
         Mat src_mat = new Mat(4,1, CvType.CV_32FC2);
@@ -289,6 +292,12 @@ public class Transform {
         float sizeF = (float)((points[0].y / MODULE_SIZE + 3.5) + (points[1].x / MODULE_SIZE + 3.5)) / 2;
         size = 21 + 4 * (int)Math.round((sizeF - 21) / 4);
         Log.d("TAILLE DU QR CODE", String.valueOf(size));
+        if(size < 21) {
+            status = -1;
+            return;
+        } else {
+            status = 1;
+        }
 
 
         // On repère les points tout en bas, et tout à droite
@@ -315,11 +324,29 @@ public class Transform {
 
     }
 
+    public Mat transformBack(Mat matTransformDebug) {
+
+        Mat tf2 = new Mat();
+        Mat scaleMatrix = new Mat(3, 3, tf.type());
+        scaleMatrix.put(0, 0, 1f*ImageReader.MODULE_SIZE_DEBUG/MODULE_SIZE, 0, 0, 0, 1f*ImageReader.MODULE_SIZE_DEBUG/MODULE_SIZE, 0, 0, 0, 1);
+        Core.gemm(scaleMatrix, tf, 1, new Mat(), 0, tf2);
+
+        Mat matTransformBack = new Mat(QrDetector.IMAGE_HEIGHT, QrDetector.IMAGE_WIDTH, CvType.CV_8UC4);
+        //Imgproc.warpPerspective(matTransformDebug, matTransformBack, tfInv, matTransformBack.size());
+        Imgproc.warpPerspective(matTransformDebug, matTransformBack, tf2, matTransformBack.size(), Imgproc.WARP_INVERSE_MAP, Core.BORDER_CONSTANT, new Scalar(0, 0, 0, 0));
+
+        return matTransformBack;
+    }
+
     public Mat getMatTransform() {
         return matTransform;
     }
 
     public int getSize() {
         return size;
+    }
+
+    public int getStatus() {
+        return status;
     }
 }

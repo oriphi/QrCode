@@ -39,13 +39,29 @@ public class QrDetector {
         byte[] arrayDebug = filter.getArrayDebug();
 
         PatternFinder finder = new PatternFinder(array, arrayDebug);
+
+        if(finder.getStatus() == -1) {
+            status = -1;
+            return;
+        }
+
         Transform transform = new Transform(filter.getMatFiltered(), finder.getBg(), finder.getHg(), finder.getHd(), arrayDebug);
 
+        if(transform.getStatus() == -1) {
+            status = -1;
+            return;
+        }
+
         ImageReader reader = new ImageReader(transform.getMatTransform(), transform.getSize());
+
+        Mat matTransformBack = transform.transformBack(reader.getMatTransformDebug());
+        matTransformBack = filter.add(filter.getMatOrig(), matTransformBack);
+
         code = reader.getCode();
 
         //filter.debug();
-        filter.debug(reader.getMatTransform());
+        //filter.debug(reader.getMatTransform());
+        filter.debug(matTransformBack);
         debugBitmap = filter.getBitmapDebug();
 
         Log.d("TEMPS EXECUTION TOTAL", String.valueOf((System.nanoTime()-t) / 1000000));
@@ -57,6 +73,10 @@ public class QrDetector {
 
     public int[][] getCode() {
         return code;
+    }
+
+    public int getStatus() {
+        return status;
     }
 
 

@@ -10,10 +10,13 @@ public class ImageReader {
 
 
     private Mat matTransform;
+
+    private Mat matTransformDebug;
     private int size;
 
     private int[][] code;
 
+    public static int MODULE_SIZE_DEBUG = 10;
 
     public ImageReader(Mat matTransform, int size) {
 
@@ -43,17 +46,49 @@ public class ImageReader {
                 }
 
                 if(val < 128) {
-                    code[i][j] = 0;
-                } else {
                     code[i][j] = 1;
+                } else {
+                    code[i][j] = 0;
                 }
             }
         }
+
+        int newWidth = MODULE_SIZE_DEBUG*size;
+        buf = new byte[newWidth*newWidth*4];
+        int i, j;
+        for(int n = 0; n < buf.length; n+=4) {
+
+            i = (n/4 / newWidth) / MODULE_SIZE_DEBUG;
+            j = (n/4 % newWidth) / MODULE_SIZE_DEBUG;
+            if(code[i][j] == 0) {
+                buf[n] = (byte)(255);
+                buf[n+1] = (byte)(255);
+                buf[n+2] = (byte)(255);
+                buf[n+3] = (byte)(255);
+            } else if(code[i][j] == 1){
+                buf[n] = 0;
+                buf[n+1] = 0;
+                buf[n+2] = 0;
+                buf[n+3] = (byte)(255);
+            } else {
+                buf[n] = 127;
+                buf[n+1] = 127;
+                buf[n+2] = 127;
+                buf[n+3] = (byte)(255);
+            }
+        }
+
+        matTransformDebug = new Mat(newWidth, newWidth, CvType.CV_8UC4);
+        matTransformDebug.put(0, 0, buf);
 
     }
 
     public Mat getMatTransform() {
         return matTransform;
+    }
+
+    public Mat getMatTransformDebug() {
+        return matTransformDebug;
     }
 
     public int[][] getCode() {
