@@ -13,6 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".PrintResult"></activity>
         <activity
             android:name=".PhotoColorPicker"
             android:parentActivityName=".CameraPreview">
@@ -27,6 +28,14 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".PrintResult"
+            android:parentActivityName=".CameraPreview"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".CameraPreview" />
         </activity>
         <activity android:name=".MainActivity">
             <intent-filter>

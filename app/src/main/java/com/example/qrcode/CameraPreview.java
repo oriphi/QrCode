@@ -24,6 +24,7 @@ import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.qrcode.imageProcessing.QrDetector;
 
@@ -139,13 +140,30 @@ public class CameraPreview extends AppCompatActivity {
                     int[][] code = detector.getCode();
                     QrFactory fact = new QrFactory();
                     QrRead read = fact.getQrType(code);
+                    try {
+                        String results = read.getQrMessageDecode();
+                        Intent intent = new Intent(CameraPreview.this, PrintResult.class);
+                        intent.putExtra("Decodage", results);
+                        startActivity(intent);
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                        Context context = getApplicationContext();
+                        int duration = Toast.LENGTH_LONG;
+                        String error = "J'ai pas pu trouver de QrCode, veuillez reprendre une photo";
 
+                        Toast toast = Toast.makeText(context,error , duration);
+                        toast.show();
+                    }
+
+                    /*
                     PhotoColorPicker.photo = detector.getDebugBitmap();
                     Intent photo = new Intent(CameraPreview.this, PhotoColorPicker.class);
                     startActivity(photo);
 
                     AlertDialog alert = new AlertDialog(read.getQrMessageDecode());
                     alert.show(getSupportFragmentManager(),"Alert Dialog");
+                    */
                 }
 
 
