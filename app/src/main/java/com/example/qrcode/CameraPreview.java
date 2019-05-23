@@ -139,13 +139,26 @@ public class CameraPreview extends AppCompatActivity {
                     int[][] code = detector.getCode();
                     QrFactory fact = new QrFactory();
                     QrRead read = fact.getQrType(code);
+                    String results;
 
+                    try {
+                        results = read.getQrMessageDecode();
+                    }
+                    catch (Exception e)
+                    {
+                        results = "ERREUR, trop d'erreurs";
+                    }
+                    AlertDialog alert = new AlertDialog(results);
+                    alert.show(getSupportFragmentManager(),"Alert Dialog");
+
+                    /*
                     PhotoColorPicker.photo = detector.getDebugBitmap();
                     Intent photo = new Intent(CameraPreview.this, PhotoColorPicker.class);
                     startActivity(photo);
 
                     AlertDialog alert = new AlertDialog(read.getQrMessageDecode());
                     alert.show(getSupportFragmentManager(),"Alert Dialog");
+                    */
                 }
 
 
