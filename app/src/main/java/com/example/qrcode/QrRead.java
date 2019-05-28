@@ -63,7 +63,7 @@ public class QrRead {
 
     // Traduction des données corrigées
     String msg = this.getQRMessage(qrBytes_decode, formatbits_decode);
-
+    System.out.println("[QrRead] Message : " + msg);
     return msg;
   }
 
@@ -297,7 +297,7 @@ public class QrRead {
           mode = Integer.parseInt(bitList.substring(ind, ind + 4),2);
           System.out.println("Mode des données : " + mode);
           modeValues = getModeValues(mode);
-          if(modeValues[0] == 0)  break;	// si on a le caractère de fin de données on sort
+          if(modeValues[0] == 0)  break;	// Caractère de fin de données => Arrêt de la lecture
           ind = ind + 4;
 
           /* Récupération du nombre de caractères dans le mode donné */
@@ -313,7 +313,7 @@ public class QrRead {
               ind += modeValues[0];
           }
           if(mode == 4) {
-            msg = new String(msg.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+            msg = new String(msg.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8); // formule magique !
           }
       }
 
@@ -364,7 +364,7 @@ public class QrRead {
       return Character.toString((char) valueChar);
   }
 
-  private String bit2KanjiString(int valueChar)                     //TODO
+  private String bit2KanjiString(int valueChar)                     //TODO Kanji
   {
       return "Kanji";
   }
@@ -393,14 +393,19 @@ public class QrRead {
               if(this.qr_version <= 9)       modeValues[1] = 8;
               else if(this.qr_version <= 26) modeValues[1] = 16;
               else                           modeValues[1] = 16;
-
               break;
+          case 7:
+              System.out.println("[QrRead] mode ECI non implémenté");
+              throw new ArithmeticException("[QrRead]\nMode ECI non implémenté"); // TODO mode ECI
           case 8:
               modeValues[0] = 13;
               if(this.qr_version <= 9)       modeValues[1] = 8;
               else if(this.qr_version <= 26) modeValues[1] = 10;
               else                           modeValues[1] = 12;
               break;
+          default :
+              System.out.println("[QrRead] mode erroné " + mode + " (1,2,4,8)"); // TODO d'autres modes bizarres
+              throw new ArithmeticException("[QrRead]\nMode erroné " + mode + " (1,2,4,7,8)");
       }
       System.out.println(Arrays.toString(modeValues));
       return modeValues;

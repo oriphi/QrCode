@@ -135,23 +135,22 @@ public class CameraPreview extends AppCompatActivity {
                 if(detector.getStatus() == -1) {
                     AlertDialog alert = new AlertDialog("!!!! ERREUR !!!!");
                     alert.show(getSupportFragmentManager(),"Alert Dialog");
-                } else {
+                } else { // Lancement du décodage
                     int[][] code = detector.getCode();
                     QrFactory fact = new QrFactory();
                     String results;
                     try {
-                        QrRead read = fact.getQrType(code);
+                        QrRead read = fact.getQrType(code); // Création du type de QrCode selon la taille
                         try {
                           results = read.getQrMessageDecode();
                         }
                         catch (Exception e) {   // Exception sur get QrMessageDecode()
-                          results = "[ERREUR]\nTrop d'erreurs, correction impossible";
+                          results = "Erreur : " + e.getMessage();
                         }
                     }
                     catch (Exception e) {       // Exception sur getQrType()
-                        results = "[ERREUR]\nType de QR code non implémenté";
+                        results = "Erreur : " + e.getMessage();
                     }
-
 
                     AlertDialog alert = new AlertDialog(results);
                     alert.show(getSupportFragmentManager(),"Alert Dialog");
