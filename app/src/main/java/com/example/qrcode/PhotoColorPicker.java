@@ -21,7 +21,6 @@ public class PhotoColorPicker extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_color_picker);
-        Intent intent = getIntent();
         imageView = findViewById(R.id.bitmapView);
         imageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -43,10 +42,6 @@ public class PhotoColorPicker extends AppCompatActivity {
 
     }
 
-    /*private void getImage()
-    {
-        photo = CameraPreview.getFinalImage();
-    }*/
 
     public void setColor(int c)
     {
