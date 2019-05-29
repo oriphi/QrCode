@@ -376,6 +376,8 @@ public class QrRead {
                                      //     8: Byte, 13: Kanji
                                      // [1] longueur du code du nb de données codées dans le mode
       switch(mode) {
+          case 0:
+              break; // caractère de fin
           case 1:
               modeValues[0] = 10;
               if(this.qr_version <= 9)       modeValues[1] = 10;
