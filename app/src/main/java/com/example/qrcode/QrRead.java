@@ -377,7 +377,7 @@ public class QrRead {
                                      // [1] longueur du code du nb de données codées dans le mode
       switch(mode) {
           case 0:
-              break; // caractère de fin
+              break; // caractère de fin -> on sort avec les valeurs [0,0]
           case 1:
               modeValues[0] = 10;
               if(this.qr_version <= 9)       modeValues[1] = 10;
@@ -406,8 +406,8 @@ public class QrRead {
               else                           modeValues[1] = 12;
               break;
           default :
-              System.out.println("[QrRead] mode erroné " + mode + " (1,2,4,8)"); // TODO d'autres modes bizarres
-              throw new ArithmeticException("[QrRead]\nMode erroné " + mode + " (1,2,4,7,8)");
+              System.out.println("[QrRead] mode erroné " + mode ); // TODO d'autres modes bizarres
+              throw new ArithmeticException("[QrRead]\nMode erroné " + mode );
       }
       System.out.println(Arrays.toString(modeValues));
       return modeValues;

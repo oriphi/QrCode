@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">QrCode</string>
     <string name="title_activity_pop_up">PopUp</string>
+    <string name="scan_message">Scanner un Qr Code</string>
+    <string name="detect_message">Détection image aléatoire</string>
+    <string name="alert_message">Test AlertDialog</string>
+    <string name="pres_text">Lecteur de QR codes\n developpé dans le cadre d\'un projet d\'élèves</string>
 </resources>

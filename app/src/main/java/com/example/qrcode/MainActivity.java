@@ -31,6 +31,12 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void launchDebugMode(View view)
+    {
+        Intent intent = new Intent(this,DebugMode.class);
+        startActivity(intent);
+    }
+
     public void launchAlert(View view){
         AlertDialog alert = new AlertDialog("SALUT COMMENT CA VA");
         alert.show(getSupportFragmentManager(),"Alert Dialog");
