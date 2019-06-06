@@ -7,9 +7,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
-import android.graphics.drawable.BitmapDrawable;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -19,22 +17,20 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.hardware.camera2.*;
-import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.Toast;
 
+import com.example.qrcode.decodage.QrFactory;
+import com.example.qrcode.decodage.QrRead;
 import com.example.qrcode.imageProcessing.QrDetector;
 
 import java.util.Collections;
 
-import org.opencv.android.Utils;
-import org.opencv.core.Mat;
-import org.opencv.core.CvType;
-import org.opencv.imgproc.Imgproc;
-
 public class CameraPreview extends AppCompatActivity {
+
     int CAMERA_REQUEST_CODE = 100; // Code spécifique à chaque application (la valeur n'importe peu)
     private CameraManager cameraManager; // Objet s'occupant de gérer toute les caméras de l'appareil
     private CameraDevice cameraDevice;  // Caméra utilisée
@@ -44,8 +40,6 @@ public class CameraPreview extends AppCompatActivity {
     private int cameraFacing;           // Indice de la caméra que l'on va utiliser dans la liste des caméras
     private CameraDevice.StateCallback stateCallback;       // Fonction de callback pour la création de caméra
 
-
-    //static private Bitmap finalImage = null;    // Bitmap qui va contenir l'image que l'on va prendre
 
     private Size previewSize;                   // Taille des photos capturé par la caméra
     private String cameraId;                    // Identifiant unique de la caméra
@@ -126,16 +120,26 @@ public class CameraPreview extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // pour l'instant, on récupère le bitmap sur l'objet textureView, puis on lance une nouvelle activité pipette qui affiche la
-                // couleur du pixel sur lequel on appuie
 
                 //finalImage = image.createScaledBitmap(image, 600,800, false);
 
+                // Lancement de la détection de qr code
                 QrDetector detector = new QrDetector(textureView.getBitmap());
+
+                // on vérifie si un qr code a été détecté
                 if(detector.getStatus() == -1) {
-                    AlertDialog alert = new AlertDialog("!!!! ERREUR !!!!");
-                    alert.show(getSupportFragmentManager(),"Alert Dialog");
-                } else { // Lancement du décodage
+
+                    // pas de qr code détecté
+                    Context context = getApplicationContext();
+                    CharSequence text = "Erreur : Aucun QR Code n'a été détecté !";
+                    int duration = Toast.LENGTH_LONG;
+
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+
+                } else {
+
+                    // Un QR Code a été détecté : Lancement du décodage
                     int[][] code = detector.getCode();
                     QrFactory fact = new QrFactory();
                     String results;
@@ -152,48 +156,29 @@ public class CameraPreview extends AppCompatActivity {
                         results = "Erreur : " + e.getMessage();
                     }
 
+                    // Si on est en mode débug, on affiche le débug
+                    if(DebugMode.DEBUG_MODE) {
+                        PhotoColorPicker.photo = detector.getDebugBitmap();
+                        Intent photo = new Intent(CameraPreview.this, PhotoColorPicker.class);
+                        startActivity(photo);
+                    }
+
                     AlertDialog alert = new AlertDialog(results);
                     alert.show(getSupportFragmentManager(),"Alert Dialog");
 
-                    /*
-                    PhotoColorPicker.photo = detector.getDebugBitmap();
-                    Intent photo = new Intent(CameraPreview.this, PhotoColorPicker.class);
-                    startActivity(photo);
+                    Context context = getApplicationContext();
+                    CharSequence text = detector.getDebugMessage();
+                    int duration = Toast.LENGTH_LONG;
 
-                    AlertDialog alert = new AlertDialog(read.getQrMessageDecode());
-                    alert.show(getSupportFragmentManager(),"Alert Dialog");
-                    */
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+
                 }
-
-
-                /*
-                int width = image.getWidth();
-                int height = image.getHeight();
-                Log.d("Camera Preview","Hauteur: " + Integer.toString(height));
-                Log.d("Camera Preview","Largeur: " + Integer.toString(width));
-                Log.d("Camera Preview","Premier Pixel: " + Integer.toString(image.getPixel(0,0)));
-
-                int[] rgb = ColorToRGB(image.getPixel(0,0));
-                Log.d("Camera Preview", "[a,r,g,b]" + Arrays.toString(rgb));
-                */
-
 
             }
         });
 
     }
-/*
-    static public Bitmap getFinalImage()
-    {
-        return finalImage;
-    }
-
-    private void launchColorPicker() {
-        PhotoColorPicker.photo = finalImage;
-        Intent photo = new Intent(this, PhotoColorPicker.class);
-        startActivity(photo);
-    }
-*/
 
     private void setUpCamera()
             // Fonction utilisée pour configurer la caméra une fois que le preview est disponible
@@ -326,16 +311,4 @@ public class CameraPreview extends AppCompatActivity {
 
     }
 
-    private int[] ColorToRGB(int color)
-    {
-        // Renvoie les 4 composantes du pixel
-        int a,r,g,b;
-        a = (color >> 24) & 0xff;
-        r = (color >> 16) & 0xff;
-        g = (color >> 8) & 0xff;
-        b = (color ) & 0xff;
-
-        return new int[]{a,r,g,b};
-
-    }
 }

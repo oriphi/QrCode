@@ -1,4 +1,4 @@
-package com.example.qrcode;
+package com.example.qrcode.decodage;
 
 public class BCHDecoder {
     static private int poids(int x)

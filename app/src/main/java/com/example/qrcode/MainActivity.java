@@ -19,11 +19,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        System.loadLibrary("opencv_java3"); // OUVERTURE DE LA LIBRAIRIE OPENCV
+        // OUVERTURE DE LA LIBRAIRIE OPENCV
+        System.loadLibrary("opencv_java3");
 
         setContentView(R.layout.activity_main);
     }
-
 
     public void onClick(View view)
     {
@@ -35,47 +35,6 @@ public class MainActivity extends AppCompatActivity {
     {
         Intent intent = new Intent(this,DebugMode.class);
         startActivity(intent);
-    }
-
-    public void launchAlert(View view){
-        AlertDialog alert = new AlertDialog("SALUT COMMENT CA VA");
-        alert.show(getSupportFragmentManager(),"Alert Dialog");
-    }
-
-    public void detect(View view) {
-
-        int[] ids = new int[]{R.drawable._1, R.drawable._2, R.drawable._3, R.drawable._4, R.drawable._5, R.drawable._6, R.drawable._7, R.drawable._8, R.drawable._9, R.drawable._10,
-                R.drawable._11, R.drawable._12, R.drawable._13, R.drawable._14, R.drawable._15, R.drawable._16, R.drawable._17, R.drawable._18, R.drawable._19, R.drawable._20,
-                R.drawable._21, R.drawable._22, R.drawable._23, R.drawable._24, R.drawable._25, R.drawable._26, R.drawable._27, R.drawable._28, R.drawable._29, R.drawable._30};
-
-        //ids = new int[]{R.drawable.test, R.drawable.test2};
-
-        int rand = (int)(Math.random()*ids.length);
-
-        Log.d("IMAGE RANDOM", String.valueOf(rand+1));
-
-        Drawable d = ContextCompat.getDrawable(this, ids[rand]);
-        Bitmap bitmap = ((BitmapDrawable)d).getBitmap();
-
-        // DETECTION ///////////////////////////
-        QrDetector detector = new QrDetector(bitmap);
-        if(detector.getStatus() == -1) {
-            AlertDialog alert = new AlertDialog("!!!! ERREUR !!!!");
-            alert.show(getSupportFragmentManager(),"Alert Dialog");
-        } else {
-            int[][] code = detector.getCode();
-            QrFactory fact = new QrFactory();
-            QrRead read = fact.getQrType(code);
-
-            PhotoColorPicker.photo = detector.getDebugBitmap();
-            Intent photo = new Intent(this, PhotoColorPicker.class);
-            startActivity(photo);
-
-            AlertDialog alert = new AlertDialog(read.getQrMessageDecode());
-            alert.show(getSupportFragmentManager(),"Alert Dialog");
-        }
-
-
     }
 
 }

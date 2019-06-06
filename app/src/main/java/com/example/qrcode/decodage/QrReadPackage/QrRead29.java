@@ -1,13 +1,13 @@
-package com.example.qrcode.QrReadPackage;
+package com.example.qrcode.decodage.QrReadPackage;
 
-import com.example.qrcode.QrRead;
+import com.example.qrcode.decodage.QrRead;
 
-public class QrRead41 extends QrRead {
+public class QrRead29 extends QrRead {
 
-  public QrRead41(int[][] qrcode_table) {	// créer un QRcode carré à partir d'un tableau
+  public QrRead29(int[][] qrcode_table) {	// créer un QRcode carré à partir d'un tableau
     super(qrcode_table);
-    this.qr_nbBytes = 172;
-    System.out.println("QRCode 41x41 construit\n");
+    this.qr_nbBytes = 70;
+    System.out.println("QRCode 29x29 construit\n");
   }
 
   protected String getQRData() {			// Renvoie une String de tous les bits
@@ -17,14 +17,11 @@ public class QrRead41 extends QrRead {
 
     // positions de départ hardcodées (i,j), sens de parcours nombres de lignes (0:down, 1:up),
     // nombres de lignes à lire (nb_lines), spécial 1 colonnes (0:2 col, 1:1 col)
-    int[][] start_bits_list = new int[][] {{40,40,1,32,0}, {9,38,0,32,0}, {40,36,1,4,0}, {31,36,1,23,0}, {9,34,0,23,0},
-            {37,34,0,4,0}, {40,32,1,4,0}, {36,31,1,5,1}, {31,32,1,25,0}, {5,32,1,6,0}, {0,30,0,6,0}, {7,30,0,34,0},
-            {40,28,1,34,0}, {5,28,1,6,0}, {0,26,0,6,0}, {7,26,0,34,0}, {40,24,1,34,0}, {5,24,1,6,0}, {0,22,0,6,0},
-            {7,22,0,34,0}, {40,20,1,34,0}, {5,20,1,6,0}, {0,18,0,6,0}, {7,18,0,34,0}, {40,16,1,34,0}, {5,16,1,6,0},
-            {0,14,0,6,0}, {7,14,0,34,0}, {40,12,1,34,0}, {5,12,1,6,0}, {0,10,0,6,0}, {7,10,0,34,0}, {32,8,1,24,0},
-            {9,5,0,24,0}, {32,3,1,24,0}, {9,1,0,20,0}, {29,1,0,1,1}};
-
-
+    int[][] start_bits_list = new int[][] {{28,28,1,20,0}, {9,26,0,20,0}, {28,24,1,4,0}, {19,24,1,11,0}, {9,22,0,11,0}, {25,22,0,4,0},
+                                           {28,20,1,4,0}, {24,19,1,5,1}, {19,20,1,13,0}, {5,20,1,6,0}, {0,18,0,6,0}, {7,18,0,22,0},
+                                           {28,16,1,22,0}, {5,16,1,6,0}, {0,14,0,6,0}, {7,14,0,22,0}, {28,12,1,22,0}, {5,12,1,6,0},
+                                           {0,10,0,6,0}, {7,10,0,22,0}, {20,8,1,12,0}, {9,5,0,12,0}, {20,3,1,12,0}, {9,1,0,8,0},
+                                           {17,1,0,1,1}};
     int[] start_bit;
 
     /* --- Traitement --- */
@@ -48,16 +45,16 @@ public class QrRead41 extends QrRead {
 
     switch(correctionLevel) { //nb de bytes de redondance (total - bytes de données); nb de blocs
       case 1 : // Low
-        correctionValue = new int[] {36,2};
+        correctionValue = new int[] {15,1};
         break;
       case 0 :
-        correctionValue = new int[] {64,4};
+        correctionValue = new int[] {26,1};
         break;
       case 3 :
-        correctionValue = new int[] {96,4};
+        correctionValue = new int[] {36,2};
         break;
       case 2 :
-        correctionValue = new int[] {112,4};
+        correctionValue = new int[] {44,2};
         break;
     }
     return correctionValue;

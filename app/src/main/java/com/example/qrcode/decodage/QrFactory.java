@@ -1,6 +1,6 @@
-package com.example.qrcode;
+package com.example.qrcode.decodage;
 
-import com.example.qrcode.QrReadPackage.*; // on importe toutes les classes de QrReadPackage
+import com.example.qrcode.decodage.QrReadPackage.*; // on importe toutes les classes de QrReadPackage
 
 public class QrFactory {
 

@@ -1,6 +1,6 @@
-package com.example.qrcode.QrReadPackage;
+package com.example.qrcode.decodage.QrReadPackage;
 
-import com.example.qrcode.QrRead;
+import com.example.qrcode.decodage.QrRead;
 
 public class QrRead37 extends QrRead {
 

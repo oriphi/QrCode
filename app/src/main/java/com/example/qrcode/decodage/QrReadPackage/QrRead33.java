@@ -1,13 +1,13 @@
-package com.example.qrcode.QrReadPackage;
+package com.example.qrcode.decodage.QrReadPackage;
 
-import com.example.qrcode.QrRead;
+import com.example.qrcode.decodage.QrRead;
 
-public class QrRead25 extends QrRead {
+public class QrRead33 extends QrRead {
 
-  public QrRead25(int[][] qrcode_table) {	// créer un QRcode carré à partir d'un tableau
+  public QrRead33(int[][] qrcode_table) {	// créer un QRcode carré à partir d'un tableau
     super(qrcode_table);
-    this.qr_nbBytes = 44;
-    System.out.println("QRCode 25x25 construit\n");
+    this.qr_nbBytes = 100;
+    System.out.println("QRCode 33x33 construit\n");
   }
 
   protected String getQRData() {			// Renvoie une String de tous les bits
@@ -17,10 +17,12 @@ public class QrRead25 extends QrRead {
 
     // positions de départ hardcodées (i,j), sens de parcours nombres de lignes (0:down, 1:up),
     // nombres de lignes à lire (nb_lines), spécial 1 colonnes (0:2 col, 1:1 col)
-    int[][] start_bits_list = new int[][] { {24,24,1,16,0}, {9,22,0,16,0}, {24,20,1,4,0}, {15,20,1,7,0}, {9,18,0,7,0}, {21,18,0,4,0},
-                                            {24,16,1,4,0}, {20,15,1,5,1}, {15,16,1,9,0}, {5,16,1,6,0}, {0,14,0,6,0}, {7,14,0,18,0},
-                                            {24,12,1,18,0}, {5,12,1,6,0}, {0,10,0,6,0}, {7,10,0,18,0}, {16,8,1,8,0}, {9,5,0,8,0},
-                                            {16,3,1,8,0},{9,1,0,4,0},{13,1,1,1,1}};
+    int[][] start_bits_list = new int[][] {{32,32,1,24,0}, {9,30,0,24,0}, {32,28,1,4,0}, {23,28,1,15,0}, {9,26,0,15,0},
+            {29,26,0,4,0}, {32,24,1,4,0}, {28,23,1,5,1}, {23,24,1,17,0}, {5,24,1,6,0}, {0,22,0,6,0}, {7,22,0,26,0},
+            {32,20,1,26,0}, {5,20,1,6,0}, {0,18,0,6,0}, {7,18,0,26,0}, {32,16,1,26,0}, {5,16,1,6,0}, {0,14,0,6,0},
+            {7,14,0,26,0}, {32,12,1,26,0}, {5,12,1,6,0}, {0,10,0,6,0}, {7,10,0,26,0}, {24,8,1,16,0}, {9,5,0,16,0},
+            {24,3,1,16,0}, {9,1,0,12,0}, {21,1,0,1,1}};
+
     int[] start_bit;
 
     /* --- Traitement --- */
@@ -44,18 +46,19 @@ public class QrRead25 extends QrRead {
 
     switch(correctionLevel) { //nb de bytes de redondance (total - bytes de données); nb de blocs
       case 1 : // Low
-        correctionValue = new int[] {10,1};
+        correctionValue = new int[] {20,1};
         break;
       case 0 :
-        correctionValue = new int[] {16,1};
+        correctionValue = new int[] {36,2};
         break;
       case 3 :
-        correctionValue = new int[] {22,1};
+        correctionValue = new int[] {52,2};
         break;
       case 2 :
-        correctionValue = new int[] {28,1};
+        correctionValue = new int[] {64,4};
         break;
     }
     return correctionValue;
   }
 }
+

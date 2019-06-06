@@ -3,6 +3,8 @@ package com.example.qrcode.imageProcessing;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.example.qrcode.DebugMode;
+
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -89,11 +91,16 @@ public class ImageFilter {
         matFiltered = new Mat (QrDetector.IMAGE_HEIGHT, QrDetector.IMAGE_WIDTH, CvType.CV_8UC1);
         matFiltered.put(0, 0, copy);
 
-        arrayDebug = new byte[3 * QrDetector.IMAGE_HEIGHT * QrDetector.IMAGE_WIDTH];
-        for(int i = 0; i < arrayFiltered.length; i++) {
-            arrayDebug[3*i] = copy[i];
-            arrayDebug[3*i+1] = copy[i];
-            arrayDebug[3*i+2] = copy[i];
+
+        if(DebugMode.DEBUG_MODE) {
+
+            arrayDebug = new byte[3 * QrDetector.IMAGE_HEIGHT * QrDetector.IMAGE_WIDTH];
+            for(int i = 0; i < arrayFiltered.length; i++) {
+                arrayDebug[3*i] = copy[i];
+                arrayDebug[3*i+1] = copy[i];
+                arrayDebug[3*i+2] = copy[i];
+            }
+
         }
 
     }

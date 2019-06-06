@@ -2,11 +2,11 @@ package com.example.qrcode;
 
 
 
-import android.accessibilityservice.FingerprintGestureController;
+import com.example.qrcode.decodage.ReedSolomon;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+
 import java.util.Arrays;
 import java.util.Random;
 

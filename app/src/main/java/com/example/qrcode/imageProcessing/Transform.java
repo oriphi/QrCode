@@ -2,6 +2,8 @@ package com.example.qrcode.imageProcessing;
 
 import android.util.Log;
 
+import com.example.qrcode.DebugMode;
+
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -172,15 +174,6 @@ public class Transform {
                 iMax = i;
             }
         }
-/*
-        for(int i = 0; i < buf.length; i++) {
-            buf[i] = 255 * (buf[i] - min) / (max - min);
-        }
-*/
-        //matFilter.put(0, 0, buf);
-        //matFilter.convertTo(matFilter, CvType.CV_8UC1);
-        //matTransform = matFilter;
-
 
         int xMax = iMax % width;
         int yMax = iMax / width;
@@ -202,54 +195,6 @@ public class Transform {
 
     }
 
-    /*
-    // TEST
-    private void filter2() {
-
-        Mat kernel = kernel(1, 3, -1, 1, -1);
-
-        float xFinder = MODULE_SIZE * (size + 6.5f);
-        float yFinder = MODULE_SIZE * (size / 2f);
-
-        int width = 2*MODULE_SIZE;
-        int height = MODULE_SIZE * (size - 10);
-
-        int xStart = (int)Math.round(xFinder) - width / 2;
-        int yStart = (int)Math.round(yFinder) - height / 2;
-
-        Mat matCrop = cropTransform(xStart, yStart, width, height);
-
-        Mat matFilter = new Mat();
-        Imgproc.filter2D(matCrop, matFilter, CvType.CV_32F, kernel);
-
-        float[] buf = new float[width * height];
-        matFilter.get(0, 0, buf);
-        float min = Float.MAX_VALUE;
-        float max = Float.MIN_VALUE;
-        int iMax = 0;
-
-        for(int i = 0; i < buf.length; i++) {
-            if(buf[i] < min) {
-                min = buf[i];
-            }
-            if(buf[i] > max) {
-                //Log.d("LITTLE FINDER", (i%width) + " ; " + (i/width) + " : " + buf[i]);
-                max = buf[i];
-                iMax = i;
-            }
-        }
-
-        for(int i = 0; i < buf.length; i++) {
-            buf[i] = 255 * (buf[i] - min) / (max - min);
-        }
-
-        matFilter.put(0, 0, buf);
-        matFilter.convertTo(matFilter, CvType.CV_8UC1);
-        matTransform = matFilter;
-
-    }
-    */
-
 
     private void analyze() {
 
@@ -267,15 +212,19 @@ public class Transform {
         Point c4 = MathUtil.intersectLines(bgVert[1], hgVert[1], hgHorz[1], hdHorz[1]);
 
         // DEBUG
-        draw(hgVert[0], (byte) 0, (byte) 255, (byte) 0);
-        draw(hgVert[1], (byte) 0, (byte) 255, (byte) 0);
-        draw(bgVert[0], (byte) 255, (byte) 0, (byte) 0);
-        draw(bgVert[1], (byte) 255, (byte) 0, (byte) 0);
+        if(DebugMode.DEBUG_MODE) {
 
-        draw(hgHorz[0], (byte) 0, (byte) 255, (byte) 0);
-        draw(hgHorz[1], (byte) 0, (byte) 255, (byte) 0);
-        draw(hdHorz[0], (byte) 0, (byte) 0, (byte) 255);
-        draw(hdHorz[1], (byte) 0, (byte) 0, (byte) 255);
+            draw(hgVert[0], (byte) 0, (byte) 255, (byte) 0);
+            draw(hgVert[1], (byte) 0, (byte) 255, (byte) 0);
+            draw(bgVert[0], (byte) 255, (byte) 0, (byte) 0);
+            draw(bgVert[1], (byte) 255, (byte) 0, (byte) 0);
+
+            draw(hgHorz[0], (byte) 0, (byte) 255, (byte) 0);
+            draw(hgHorz[1], (byte) 0, (byte) 255, (byte) 0);
+            draw(hdHorz[0], (byte) 0, (byte) 0, (byte) 255);
+            draw(hdHorz[1], (byte) 0, (byte) 0, (byte) 255);
+
+        }
 
         // On effectue la première transformation
         Mat src_mat = new Mat(4,1, CvType.CV_32FC2);

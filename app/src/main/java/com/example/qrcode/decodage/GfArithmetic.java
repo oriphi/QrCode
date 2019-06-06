@@ -1,4 +1,4 @@
-package com.example.qrcode;
+package com.example.qrcode.decodage;
 
 import java.util.Arrays;
 

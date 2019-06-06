@@ -1,5 +1,4 @@
-package com.example.qrcode;
-import com.example.qrcode.GfArithmetic;
+package com.example.qrcode.decodage;
 import java.util.Arrays;
 
 

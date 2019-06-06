@@ -3,6 +3,8 @@ package com.example.qrcode.imageProcessing;
 
 import android.util.Log;
 
+import com.example.qrcode.DebugMode;
+
 import java.util.ArrayList;
 
 public class PatternFinder {
@@ -349,34 +351,37 @@ public class PatternFinder {
             array[j] = -128;
         }
 */
+        if(DebugMode.DEBUG_MODE) {
 
-        for(int g = 0; g < finderGroups.size(); g++) {
-            byte v1, v2, v3;
-            if(g == bg) {
-                v1 = (byte)255;
-                v2 = 0;
-                v3 = 0;
-            } else if(g == hg) {
-                v1 = 0;
-                v2 = (byte)255;
-                v3 = 0;
-            } else if(g == hd) {
-                v1 = 0;
-                v2 = 0;
-                v3 = (byte)255;
-            } else {
-                v1 = (byte)255;
-                v2 = (byte)255;
-                v3 = 0;
-            }
-            for(int direction = 0; direction < 4; direction++) {
-                int increment = lineArrayIndices(direction, 0)[1];
-                for(FinderLine line : finderGroups.get(g).getLines(direction)) {
-                    for(int j = line.getJ2(); j < line.getJ3(); j += increment) {
-                        arrayDebug[3*j] = v1;
-                        arrayDebug[3*j+1] = v2;
-                        arrayDebug[3*j+2] = v3;
+            for(int g = 0; g < finderGroups.size(); g++) {
+                byte v1, v2, v3;
+                if(g == bg) {
+                    v1 = (byte)255;
+                    v2 = 0;
+                    v3 = 0;
+                } else if(g == hg) {
+                    v1 = 0;
+                    v2 = (byte)255;
+                    v3 = 0;
+                } else if(g == hd) {
+                    v1 = 0;
+                    v2 = 0;
+                    v3 = (byte)255;
+                } else {
+                    v1 = (byte)255;
+                    v2 = (byte)255;
+                    v3 = 0;
+                }
+                for(int direction = 0; direction < 4; direction++) {
+                    int increment = lineArrayIndices(direction, 0)[1];
+                    for(FinderLine line : finderGroups.get(g).getLines(direction)) {
+                        for(int j = line.getJ2(); j < line.getJ3(); j += increment) {
+                            arrayDebug[3*j] = v1;
+                            arrayDebug[3*j+1] = v2;
+                            arrayDebug[3*j+2] = v3;
+                        }
                     }
+
                 }
 
             }

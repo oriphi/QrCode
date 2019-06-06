@@ -1,10 +1,9 @@
-package com.example.qrcode;
+package com.example.qrcode.decodage;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
-import static com.example.qrcode.BCHDecoder.qrFormat;
+import static com.example.qrcode.decodage.BCHDecoder.qrFormat;
 
 public class QrRead {
 
