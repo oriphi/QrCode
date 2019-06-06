@@ -23,11 +23,21 @@ public class QrDetector {
 
     private String debugMessage = "";
 
-    public QrDetector(Bitmap imageBitmap) {
+    public QrDetector(Bitmap imageBitmap, boolean resize) {
 
-        this.imageBitmap = imageBitmap;
-        IMAGE_WIDTH = imageBitmap.getWidth();
-        IMAGE_HEIGHT = imageBitmap.getHeight();
+        if(resize) {
+
+            IMAGE_WIDTH = imageBitmap.getWidth()/3;
+            IMAGE_HEIGHT = imageBitmap.getHeight()/3;
+            this.imageBitmap = Bitmap.createScaledBitmap(imageBitmap, IMAGE_WIDTH,IMAGE_HEIGHT, false);
+
+        } else {
+
+            IMAGE_WIDTH = imageBitmap.getWidth();
+            IMAGE_HEIGHT = imageBitmap.getHeight();
+            this.imageBitmap = imageBitmap;
+
+        }
 
         analyze();
 

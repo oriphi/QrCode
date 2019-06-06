@@ -7,6 +7,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.os.Handler;
@@ -124,7 +125,10 @@ public class CameraPreview extends AppCompatActivity {
                 //finalImage = image.createScaledBitmap(image, 600,800, false);
 
                 // Lancement de la détection de qr code
-                QrDetector detector = new QrDetector(textureView.getBitmap());
+                QrDetector detector = new QrDetector(textureView.getBitmap(), true);
+                if(detector.getStatus() == -1) {
+                    detector = new QrDetector(textureView.getBitmap(), false);
+                }
 
                 // on vérifie si un qr code a été détecté
                 if(detector.getStatus() == -1) {

@@ -302,14 +302,38 @@ public class PatternFinder {
 
         checkLines(0);
 
+
         //Log.d("NOMBRE DE GROUPES", String.valueOf(finderGroups.size()));
 
         checkLines(1);
+
+        for(int g = finderGroups.size()-1; g >= 0; g--) {
+            int miss = 0;
+            for(int direction = 0; direction <= 1; direction++) {
+                if(finderGroups.get(g).getLines(direction).size() == 0) {
+                    miss++;
+                }
+            }
+            if(miss >= 1) {
+                finderGroups.remove(g);
+            }
+        }
 
         //Log.d("NOMBRE DE GROUPES", String.valueOf(finderGroups.size()));
 
         checkLines(2);
 
+        for(int g = finderGroups.size()-1; g >= 0; g--) {
+            int miss = 0;
+            for(int direction = 0; direction <= 2; direction++) {
+                if(finderGroups.get(g).getLines(direction).size() == 0) {
+                    miss++;
+                }
+            }
+            if(miss >= 1) {
+                finderGroups.remove(g);
+            }
+        }
         //Log.d("NOMBRE DE GROUPES", String.valueOf(finderGroups.size()));
 
         checkLines(3);
@@ -319,12 +343,12 @@ public class PatternFinder {
 
         for(int g = finderGroups.size()-1; g >= 0; g--) {
             int miss = 0;
-            for(int direction = 0; direction < 4; direction++) {
+            for(int direction = 0; direction <= 3; direction++) {
                 if(finderGroups.get(g).getLines(direction).size() == 0) {
                     miss++;
                 }
             }
-            if(miss > 1) {
+            if(miss >= 1) {
                 finderGroups.remove(g);
             }
 
