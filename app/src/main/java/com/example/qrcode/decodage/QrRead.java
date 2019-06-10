@@ -24,7 +24,9 @@ public class QrRead {
     /* ------------ CONSTRUCTEURS ---------------- */
 
   public QrRead(int[][] qrcode_table)   // Partiellement implémentée dans les sous classes
-  { // Classes correction d'erreurs
+  {
+    initInt2AlphaNum();
+    // Classes correction d'erreurs
     this.RS = new ReedSolomon();
 
     // Paramètres du QR code
@@ -36,7 +38,7 @@ public class QrRead {
     // Initialisation du tableau
     for (int i = 0; i < this.qr_size; i++) {
       for (int j = 0; j < this.qr_size; j++) {
-        this.qr_data[i][j] = qrcode_table[i][j]; //
+        this.qr_data[i][j] = qrcode_table[i][j];
       }
     }
   }
@@ -492,11 +494,12 @@ public class QrRead {
 
     for(int i = 0; i < nbShortBlocs; i++) { // Correction blocs courts
       System.out.println("\nCorr bloc court : " + i);
-      System.out.println(Arrays.toString(bytesShort[i]) + " ----- " + lenCorrect);
+      System.out.println(Arrays.toString(bytesShort[i]));
       bytesShort_corr[i] = this.RS.correctRs(bytesShort[i], lenCorrect);
     }
     for(int i = 0; i < nbLongBlocs; i++) { // Correction blocs longs
       System.out.println("\nCorr bloc long  : " + i);
+      System.out.println(Arrays.toString(bytesLong[i]));
       bytesLong_corr[i] = this.RS.correctRs(bytesLong[i], lenCorrect);
     }
 

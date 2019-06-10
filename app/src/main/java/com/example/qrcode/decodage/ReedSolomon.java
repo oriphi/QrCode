@@ -5,7 +5,7 @@ import java.util.Arrays;
 public class ReedSolomon {
     GfArithmetic gf;
 
-    ReedSolomon() {
+    public ReedSolomon() {
         this.gf = new GfArithmetic();
     }
 
@@ -107,11 +107,11 @@ public class ReedSolomon {
             // On shift C
             C = this.gf.polyShift(C);
             K++;
-            System.out.println("e: " + Integer.toString(e));
+            /*System.out.println("e: " + Integer.toString(e));
             System.out.println("L: " + Integer.toString(L));
             System.out.println("K: " + Integer.toString(K));
             System.out.println("Lambda: " + Arrays.toString(Lambda));
-            System.out.println("C: " + Arrays.toString(C));
+            System.out.println("C: " + Arrays.toString(C));*/
         }
         return Lambda;
     }
@@ -204,9 +204,9 @@ public class ReedSolomon {
         */
         Omega = this.gf.polyDiv(Omega, p);
         //System.out.println("Omega = "+ Arrays.toString(Omega));
-        System.out.println("[RS] indices : " + Arrays.toString(indices)); //TODO
-        System.out.println("Omega: " + Arrays.toString(Omega));
-        System.out.println("Lambda" + Arrays.toString(Lambda));
+        System.out.println("[RS] indices : " + Arrays.toString(indices));
+        //System.out.println("Omega: " + Arrays.toString(Omega));
+        //System.out.println("Lambda" + Arrays.toString(Lambda));
         for (i = 0; i < racines.length; i++) {
             X = racines[i];
             O = this.gf.polyEval(Omega, X);
@@ -215,7 +215,7 @@ public class ReedSolomon {
             a = this.gf.gfMul(O, L2);
             msgCorrected[indices[i]] ^= this.gf.gfMul(this.gf.gfInv(X), a);
         }
-        System.out.println("msgCorr: " + Arrays.toString(msgCorrected));
+        //System.out.println("msgCorr: " + Arrays.toString(msgCorrected));
         int[] syndtest = evalueSyndromes(msgCorrected, N);
         System.out.println("SyndTest: " + Arrays.toString(syndtest));
         for (i = 0; i < syndtest.length; i++) {
